@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\Category;
+use App\Exports\CoursesExport;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -12,16 +14,50 @@ class CourseController extends Controller
 {
     public function index(Request $request)
     {
+        $perPage = in_array((int) $request->per_page, [10, 25, 50, 100]) ? (int) $request->per_page : 15;
         $courses = Course::with(['category', 'creator'])
             ->when($request->search, fn($q) => $q->where('title', 'like', '%' . $request->search . '%'))
             ->when($request->status, fn($q) => $q->where('status', $request->status))
             ->when($request->category, fn($q) => $q->where('category_id', $request->category))
             ->latest()
-            ->paginate(15);
+            ->paginate($perPage)->withQueryString();
 
         $categories = Category::where('is_active', true)->get();
 
         return view('admin.courses.index', compact('courses', 'categories'));
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $filename = 'courses_' . now()->format('Y-m-d_His') . '.xlsx';
+        return \Maatwebsite\Excel\Facades\Excel::download(
+            new CoursesExport(
+                $request->search   ?? '',
+                $request->status   ?? '',
+                $request->category ?? ''
+            ),
+            $filename
+        );
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $courses = Course::with(['category'])
+            ->when($request->search,   fn($q) => $q->where('title', 'like', '%' . $request->search . '%'))
+            ->when($request->status,   fn($q) => $q->where('status', $request->status))
+            ->when($request->category, fn($q) => $q->where('category_id', $request->category))
+            ->withCount('enrollments')
+            ->latest()
+            ->get();
+
+        $pdf = Pdf::loadView('exports.courses_pdf', [
+            'courses'  => $courses,
+            'search'   => $request->search   ?? '',
+            'status'   => $request->status   ?? '',
+            'category' => $request->category ?? '',
+        ])->setPaper('a4', 'landscape');
+
+        return $pdf->download('courses_' . now()->format('Y-m-d_His') . '.pdf');
     }
 
     public function create()
@@ -38,7 +74,6 @@ class CourseController extends Controller
             'description'       => 'nullable|string',
             'whatyoulearn'      => 'nullable|string',
             'preview_video_url' => 'nullable|url',
-            'instructor_name'   => 'required|string|max:255',
             'level'             => 'required|in:beginner,intermediate,advanced',
             'duration_hours'    => 'nullable|integer|min:0',
             'language'          => 'nullable|string|max:50',
@@ -46,6 +81,9 @@ class CourseController extends Controller
             'has_certificate'   => 'boolean',
             'thumbnail'         => 'nullable|image|max:2048',
         ]);
+
+        // Auto-set instructor name from the admin creating the course
+        $validated['instructor_name'] = auth()->user()->name;
 
         if ($request->hasFile('thumbnail')) {
             $validated['thumbnail'] = $request->file('thumbnail')->store('courses/thumbnails', 'public');
@@ -116,7 +154,6 @@ class CourseController extends Controller
             'description'       => 'nullable|string',
             'whatyoulearn'      => 'nullable|string',
             'preview_video_url' => 'nullable|url',
-            'instructor_name'   => 'required|string|max:255',
             'level'             => 'required|in:beginner,intermediate,advanced',
             'duration_hours'    => 'nullable|integer|min:0',
             'language'          => 'nullable|string|max:50',
@@ -124,6 +161,9 @@ class CourseController extends Controller
             'has_certificate'   => 'boolean',
             'thumbnail'         => 'nullable|image|max:2048',
         ]);
+
+        // Keep instructor_name up-to-date with the admin editing the course
+        $validated['instructor_name'] = auth()->user()->name;
 
         if ($request->hasFile('thumbnail')) {
             $validated['thumbnail'] = $request->file('thumbnail')->store('courses/thumbnails', 'public');

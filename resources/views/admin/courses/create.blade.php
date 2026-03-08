@@ -111,12 +111,6 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Instructor Name *</label>
-                        <input type="text" name="instructor_name" value="{{ old('instructor_name') }}" required
-                               class="form-input" placeholder="Full name" />
-                    </div>
-
-                    <div class="mb-3">
                         <label class="form-label">Language</label>
                         <input type="text" name="language" value="{{ old('language','English') }}"
                                class="form-input" placeholder="English" />

@@ -232,10 +232,6 @@
                         <span style="color:#fff;text-transform:capitalize;">{{ $course->level }}</span>
                     </div>
                     <div style="display:flex;justify-content:space-between;font-size:0.82rem;">
-                        <span style="color:rgba(255,255,255,0.4);">Instructor</span>
-                        <span style="color:#fff;">{{ $course->instructor_name }}</span>
-                    </div>
-                    <div style="display:flex;justify-content:space-between;font-size:0.82rem;">
                         <span style="color:rgba(255,255,255,0.4);">Certificate</span>
                         <span style="color:{{ $course->has_certificate ? '#4ade80' : 'rgba(255,255,255,0.5)' }};">{{ $course->has_certificate ? '✅ Yes' : 'No' }}</span>
                     </div>

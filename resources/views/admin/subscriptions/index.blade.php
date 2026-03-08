@@ -109,24 +109,28 @@
 {{-- Filter/Search card --}}
 <div class="card mb-6 animate-fade-up delay-4" style="background: linear-gradient(135deg, #160D50 0%, #120A42 100%);">
     <div class="card-inner py-4">
-        <form method="GET" class="flex flex-col sm:flex-row gap-4 items-center justify-between">
-            <div class="w-full sm:w-auto relative">
+        <form method="GET" class="flex flex-wrap items-center gap-3">
+            <div class="relative flex-1 min-w-[200px]">
                 <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by student name..." class="form-input pl-10" style="min-width: 250px; background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.08);" />
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by student name..." class="form-input w-full" style="padding-left: 2.75rem; background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.08);" />
             </div>
-            <div class="w-full sm:w-auto flex gap-3">
-                <select name="status" class="form-select" style="min-width: 150px; background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.08);">
-                    <option value="">All Statuses</option>
-                    <option value="active"    {{ request('status')=='active'?'selected':'' }}>✅ Active</option>
-                    <option value="expired"   {{ request('status')=='expired'?'selected':'' }}>⏰ Expired</option>
-                    <option value="cancelled" {{ request('status')=='cancelled'?'selected':'' }}>❌ Cancelled</option>
-                    <option value="pending"   {{ request('status')=='pending'?'selected':'' }}>⏳ Pending</option>
-                </select>
-                <button type="submit" class="btn btn-sky px-5">Filter</button>
-                @if(request()->has('search') || request()->has('status'))
-                    <a href="{{ route('admin.subscriptions.index') }}" class="btn btn-secondary px-4 text-white/50">Clear</a>
-                @endif
-            </div>
+            <select name="status" class="form-select flex-shrink-0" style="width: 150px; background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.08);">
+                <option value="">All Statuses</option>
+                <option value="active"    {{ request('status')=='active'?'selected':'' }}>✅ Active</option>
+                <option value="expired"   {{ request('status')=='expired'?'selected':'' }}>⏰ Expired</option>
+                <option value="cancelled" {{ request('status')=='cancelled'?'selected':'' }}>❌ Cancelled</option>
+                <option value="pending"   {{ request('status')=='pending'?'selected':'' }}>⏳ Pending</option>
+            </select>
+            <select name="per_page" class="form-select flex-shrink-0" style="width: 130px; background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.08);">
+                <option value="10"  {{ request('per_page','20')=='10'  ? 'selected':'' }}>10 / page</option>
+                <option value="20"  {{ request('per_page','20')=='20'  ? 'selected':'' }}>20 / page</option>
+                <option value="50"  {{ request('per_page','20')=='50'  ? 'selected':'' }}>50 / page</option>
+                <option value="100" {{ request('per_page','20')=='100' ? 'selected':'' }}>100 / page</option>
+            </select>
+            <button type="submit" class="btn btn-sky px-5 flex-shrink-0">Apply</button>
+            @if(request()->hasAny(['search', 'status', 'per_page']))
+                <a href="{{ route('admin.subscriptions.index') }}" class="btn btn-secondary px-4 text-white/50 flex-shrink-0">Clear</a>
+            @endif
         </form>
     </div>
 </div>

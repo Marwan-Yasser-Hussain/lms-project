@@ -28,6 +28,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Courses — full resource + custom show
+    Route::get('/courses/export/excel', [CourseController::class, 'exportExcel'])->name('courses.export.excel');
+    Route::get('/courses/export/pdf',   [CourseController::class, 'exportPdf'])->name('courses.export.pdf');
     Route::resource('courses', CourseController::class);
 
     // Lessons (nested under a course)
@@ -47,7 +49,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
     // Users
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::post('/users', [UserController::class, 'store'])->name('users.store');
+    Route::get('/users/export/excel', [UserController::class, 'exportExcel'])->name('users.export.excel');
+    Route::get('/users/export/pdf',   [UserController::class, 'exportPdf'])->name('users.export.pdf');
     Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
+    Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
     Route::post('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
 
     // Subscriptions — Plans CRUD

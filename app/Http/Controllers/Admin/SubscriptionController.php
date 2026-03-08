@@ -13,11 +13,12 @@ class SubscriptionController extends Controller
     {
         $plans = SubscriptionPlan::withCount('subscriptions')->orderBy('sort_order')->get();
 
+        $perPage = in_array((int) $request->per_page, [10, 25, 50, 100]) ? (int) $request->per_page : 20;
         $subscriptions = Subscription::with(['user', 'plan'])
             ->when($request->search, fn($q) => $q->whereHas('user', fn($u) => $u->where('name', 'like', '%' . $request->search . '%')))
             ->when($request->status, fn($q) => $q->where('status', $request->status))
             ->latest()
-            ->paginate(20);
+            ->paginate($perPage)->withQueryString();
 
         return view('admin.subscriptions.index', compact('plans', 'subscriptions'));
     }

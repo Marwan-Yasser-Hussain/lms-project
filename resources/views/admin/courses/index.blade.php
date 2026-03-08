@@ -18,14 +18,16 @@
             </p>
         </div>
         <div class="flex flex-wrap items-center gap-3">
-            <button type="button" class="btn text-white transition-opacity hover:opacity-90 px-4" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);" title="Export to PDF (Coming Soon)">
+            <a href="{{ route('admin.courses.export.pdf', request()->only(['search','status','category'])) }}"
+               class="btn text-white transition-opacity hover:opacity-90 px-4" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);" title="Export to PDF">
                 <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11v6m0 0l-3-3m3 3l3-3" /></svg>
                 PDF
-            </button>
-            <button type="button" class="btn text-white transition-opacity hover:opacity-90 px-4" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399;" title="Export to Excel (Coming Soon)">
+            </a>
+            <a href="{{ route('admin.courses.export.excel', request()->only(['search','status','category'])) }}"
+               class="btn text-white transition-opacity hover:opacity-90 px-4" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399;" title="Export to Excel">
                 <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                 Excel
-            </button>
+            </a>
             <a href="{{ route('admin.courses.create') }}" class="btn btn-primary" style="background: linear-gradient(135deg, #930056, #6d003f); color: #fff; border: 1px solid #ff80c8; box-shadow: 0 4px 14px rgba(147, 0, 86, 0.45);">
                 <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                 Publish Course
@@ -41,29 +43,32 @@
 {{-- Filters Card --}}
 <div class="card mb-6 animate-fade-up delay-2" style="background: linear-gradient(135deg, #160D50 0%, #120A42 100%);">
     <div class="card-inner py-4">
-        <form method="GET" action="{{ route('admin.courses.index') }}" class="flex flex-nowrap items-center gap-3 overflow-x-auto pb-1">
-            <div class="relative flex-grow min-w-[200px] max-w-xs">
+        <form method="GET" action="{{ route('admin.courses.index') }}" class="flex flex-wrap items-center gap-3">
+            <div class="relative flex-1 min-w-[200px]">
                 <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by title..."
-                       class="form-input pl-10 w-full" style="background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.08);" />
+                       class="form-input w-full" style="padding-left: 2.75rem; background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.08);" />
             </div>
-            
-            <select name="status" class="form-select flex-shrink-0" style="width: 140px; background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.08);">
+            <select name="status" class="form-select flex-shrink-0" style="width: 150px; background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.08);">
                 <option value="">All Statuses</option>
                 <option value="published" {{ request('status')=='published'?'selected':'' }}>🟢 Published</option>
                 <option value="draft"     {{ request('status')=='draft'?'selected':'' }}>📝 Draft</option>
             </select>
-            
             <select name="category" class="form-select flex-shrink-0" style="width: 160px; background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.08);">
                 <option value="">All Categories</option>
                 @foreach($categories as $cat)
                 <option value="{{ $cat->id }}" {{ request('category')==$cat->id?'selected':'' }}>{{ $cat->icon ?? '' }} {{ $cat->name }}</option>
                 @endforeach
             </select>
-            
-            <button type="submit" class="btn btn-sky px-5 flex-shrink-0 whitespace-nowrap">Apply Filters</button>
-            @if(request()->hasAny(['search', 'status', 'category']))
-                <a href="{{ route('admin.courses.index') }}" class="btn btn-secondary px-4 text-white/50 flex-shrink-0 whitespace-nowrap">Clear</a>
+            <select name="per_page" class="form-select flex-shrink-0" style="width: 130px; background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.08);">
+                <option value="10"  {{ request('per_page','15')=='10'  ? 'selected':'' }}>10 / page</option>
+                <option value="25"  {{ request('per_page','15')=='25'  ? 'selected':'' }}>25 / page</option>
+                <option value="50"  {{ request('per_page','15')=='50'  ? 'selected':'' }}>50 / page</option>
+                <option value="100" {{ request('per_page','15')=='100' ? 'selected':'' }}>100 / page</option>
+            </select>
+            <button type="submit" class="btn btn-sky px-5 flex-shrink-0">Apply Filters</button>
+            @if(request()->hasAny(['search', 'status', 'category', 'per_page']))
+                <a href="{{ route('admin.courses.index') }}" class="btn btn-secondary px-4 text-white/50 flex-shrink-0">Clear</a>
             @endif
         </form>
     </div>
