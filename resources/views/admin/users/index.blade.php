@@ -84,7 +84,10 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th style="padding-left:1.5rem;">User</th>
+                    <th style="padding-left:1.5rem;width:40px;">
+                        <input type="checkbox" class="bulk-checkbox" id="selectAll" title="Select All">
+                    </th>
+                    <th>User</th>
                     <th>Role</th>
                     <th>Phone</th>
                     <th>Subscription</th>
@@ -96,8 +99,11 @@
             </thead>
             <tbody>
                 @forelse($users as $user)
-                <tr>
-                    <td style="padding-left:1.5rem;">
+                <tr data-id="{{ $user->id }}">
+                    <td style="padding-left:1.5rem;width:40px;">
+                        <input type="checkbox" class="bulk-checkbox row-check" value="{{ $user->id }}">
+                    </td>
+                    <td>
                         <div class="flex items-center gap-3">
                             <img src="{{ $user->avatar_url }}" alt="" class="avatar rounded-full" />
                             <div>
@@ -166,6 +172,21 @@
         {{ $users->withQueryString()->links('pagination::default') }}
     </div>
     @endif
+</div>
+
+{{-- Bulk Action Bar --}}
+<div id="bulkBar" class="bulk-bar">
+    <span class="bulk-bar-count" id="bulkCount">0</span>
+    <span class="bulk-bar-label">users selected</span>
+    <form id="bulkDeleteForm" method="POST" action="{{ route('admin.users.bulk-delete') }}" onsubmit="return confirmBulkDelete()">
+        @csrf
+        @method('DELETE')
+        <input type="hidden" name="ids" id="bulkIds">
+        <button type="submit" class="btn btn-danger btn-sm" style="border-color:rgba(248,113,113,0.5);">
+            🗑 Delete Selected
+        </button>
+    </form>
+    <button onclick="clearSelection()" class="btn btn-secondary btn-sm" style="font-size:0.75rem;">✕ Clear</button>
 </div>
 
 {{-- ─── Add User Modal ─────────────────────────────────────────────── --}}
@@ -381,3 +402,52 @@
 @endif
 
 @endsection
+
+@push('scripts')
+<script>
+(function () {
+    const selectAll  = document.getElementById('selectAll');
+    const bulkBar    = document.getElementById('bulkBar');
+    const bulkCount  = document.getElementById('bulkCount');
+    const bulkIds    = document.getElementById('bulkIds');
+
+    function getChecked() {
+        return [...document.querySelectorAll('.row-check:checked')];
+    }
+    function updateBar() {
+        const checked = getChecked();
+        bulkCount.textContent = checked.length;
+        bulkIds.value = checked.map(c => c.value).join(',');
+        bulkBar.classList.toggle('visible', checked.length > 0);
+        // highlight rows
+        document.querySelectorAll('.row-check').forEach(cb => {
+            cb.closest('tr').classList.toggle('row-selected', cb.checked);
+        });
+        // update select-all state
+        const all = document.querySelectorAll('.row-check');
+        selectAll.indeterminate = checked.length > 0 && checked.length < all.length;
+        selectAll.checked = all.length > 0 && checked.length === all.length;
+    }
+
+    selectAll.addEventListener('change', function () {
+        document.querySelectorAll('.row-check').forEach(cb => cb.checked = this.checked);
+        updateBar();
+    });
+
+    document.querySelectorAll('.row-check').forEach(cb => {
+        cb.addEventListener('change', updateBar);
+    });
+
+    window.clearSelection = function () {
+        document.querySelectorAll('.row-check').forEach(cb => cb.checked = false);
+        selectAll.checked = false;
+        updateBar();
+    };
+
+    window.confirmBulkDelete = function () {
+        const n = getChecked().length;
+        return confirm(`⚠️ Delete ${n} selected user${n > 1 ? 's' : ''}? This action cannot be undone.`);
+    };
+})();
+</script>
+@endpush

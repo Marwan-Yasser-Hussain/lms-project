@@ -133,4 +133,20 @@ class UserController extends Controller
         $status = $user->is_active ? 'activated' : 'deactivated';
         return back()->with('success', "User {$status} successfully.");
     }
+
+    public function bulkDelete(Request $request)
+    {
+        $ids = array_filter(explode(',', $request->input('ids', '')), 'is_numeric');
+
+        if (empty($ids)) {
+            return back()->with('error', 'No users selected.');
+        }
+
+        // Prevent the currently logged-in admin from deleting themselves
+        $ids = array_diff($ids, [auth()->id()]);
+
+        $count = User::whereIn('id', $ids)->delete();
+
+        return back()->with('success', "{$count} user(s) deleted successfully.");
+    }
 }

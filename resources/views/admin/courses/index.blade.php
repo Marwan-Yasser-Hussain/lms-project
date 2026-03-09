@@ -80,7 +80,10 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th class="pl-6 w-2/5">Course Content</th>
+                    <th class="pl-6" style="width:40px;">
+                        <input type="checkbox" class="bulk-checkbox" id="selectAll" title="Select All">
+                    </th>
+                    <th class="w-2/5">Course Content</th>
                     <th>Category</th>
                     <th class="text-center">Complexity</th>
                     <th class="text-center">Enrolled</th>
@@ -91,7 +94,10 @@
             </thead>
             <tbody>
                 @forelse($courses as $course)
-                <tr class="group hover:bg-white/5 transition-colors">
+                <tr class="group hover:bg-white/5 transition-colors" data-id="{{ $course->id }}">
+                    <td class="pl-6" style="width:40px;">
+                        <input type="checkbox" class="bulk-checkbox row-check" value="{{ $course->id }}">
+                    </td>
                     <td class="pl-6">
                         <div class="flex items-center gap-4">
                             @if($course->thumbnail)
@@ -195,4 +201,66 @@
     @endif
 </div>
 
+{{-- Bulk Action Bar --}}
+<div id="bulkBar" class="bulk-bar">
+    <span class="bulk-bar-count" id="bulkCount">0</span>
+    <span class="bulk-bar-label">courses selected</span>
+    <form id="bulkDeleteForm" method="POST" action="{{ route('admin.courses.bulk-delete') }}" onsubmit="return confirmBulkDelete()">
+        @csrf
+        @method('DELETE')
+        <input type="hidden" name="ids" id="bulkIds">
+        <button type="submit" class="btn btn-danger btn-sm" style="border-color:rgba(248,113,113,0.5);">
+            🗑 Delete Selected
+        </button>
+    </form>
+    <button onclick="clearSelection()" class="btn btn-secondary btn-sm" style="font-size:0.75rem;">✕ Clear</button>
+</div>
+
 @endsection
+
+@push('scripts')
+<script>
+(function () {
+    const selectAll  = document.getElementById('selectAll');
+    const bulkBar    = document.getElementById('bulkBar');
+    const bulkCount  = document.getElementById('bulkCount');
+    const bulkIds    = document.getElementById('bulkIds');
+
+    function getChecked() {
+        return [...document.querySelectorAll('.row-check:checked')];
+    }
+    function updateBar() {
+        const checked = getChecked();
+        bulkCount.textContent = checked.length;
+        bulkIds.value = checked.map(c => c.value).join(',');
+        bulkBar.classList.toggle('visible', checked.length > 0);
+        document.querySelectorAll('.row-check').forEach(cb => {
+            cb.closest('tr').classList.toggle('row-selected', cb.checked);
+        });
+        const all = document.querySelectorAll('.row-check');
+        selectAll.indeterminate = checked.length > 0 && checked.length < all.length;
+        selectAll.checked = all.length > 0 && checked.length === all.length;
+    }
+
+    selectAll.addEventListener('change', function () {
+        document.querySelectorAll('.row-check').forEach(cb => cb.checked = this.checked);
+        updateBar();
+    });
+
+    document.querySelectorAll('.row-check').forEach(cb => {
+        cb.addEventListener('change', updateBar);
+    });
+
+    window.clearSelection = function () {
+        document.querySelectorAll('.row-check').forEach(cb => cb.checked = false);
+        selectAll.checked = false;
+        updateBar();
+    };
+
+    window.confirmBulkDelete = function () {
+        const n = getChecked().length;
+        return confirm(`⚠️ Delete ${n} selected course${n > 1 ? 's' : ''}? This action cannot be undone.`);
+    };
+})();
+</script>
+@endpush

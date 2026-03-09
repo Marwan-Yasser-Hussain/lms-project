@@ -15,7 +15,7 @@
         <div>
             <h1 class="text-3xl font-black text-white mb-2 tracking-tight">Welcome back, {{ auth()->user()->name }} 👋</h1>
             <p class="text-white/60 text-sm md:text-base max-w-xl leading-relaxed">
-                Here's what's happening with your platform today. Check out the latest enrollments, revenue trends, and student activities below.
+                Here's what's happening with your platform today. Check out the latest enrollments, and student activities below.
             </p>
         </div>
         <div class="text-right flex-shrink-0">
@@ -24,7 +24,7 @@
         </div>
     </div>
 </div>
-
+<!-- Dont forget to remove this comment before deployment -->
 {{-- ── Refined Stat Cards ────────────────────────────────────────────────── --}}
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 

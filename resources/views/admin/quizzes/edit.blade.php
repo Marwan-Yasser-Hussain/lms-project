@@ -5,12 +5,25 @@
 
 @section('content')
 
-<div class="page-header">
-    <div>
-        <h1 class="page-title">Edit Quiz</h1>
-        <p class="page-subtitle">{{ $course->title }}</p>
+{{-- Welcome/Header Banner --}}
+<div class="mb-8 rounded-2xl relative overflow-hidden animate-fade-up"
+     style="background: linear-gradient(135deg, #1A1262 0%, #0F043D 100%); border: 1px solid rgba(255,255,255,0.05);">
+    <div class="absolute -top-24 right-10 w-64 h-64 bg-[#ff80c8] rounded-full mix-blend-screen filter blur-[90px] opacity-20 pointer-events-none"></div>
+
+    <div class="relative p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 z-10 w-full flex-wrap">
+        <div>
+            <h1 class="text-3xl font-black text-white mb-2 tracking-tight">Edit Quiz</h1>
+            <p class="text-white/60 text-sm md:text-base max-w-xl leading-relaxed">
+                {{ $course->title }}
+            </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+            <a href="{{ route('admin.courses.show', $course) }}" class="btn text-white transition-opacity hover:opacity-90 px-4"
+               style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);">
+               ← Back to Course
+            </a>
+        </div>
     </div>
-    <a href="{{ route('admin.courses.show', $course) }}" class="btn btn-secondary">← Back to Course</a>
 </div>
 
 <form method="POST" action="{{ route('admin.courses.quizzes.update', [$course, $quiz]) }}" id="quiz-form">
@@ -139,7 +152,7 @@
 @push('scripts')
 <script>
 // Existing questions from server
-const existingQuestions = @json($quiz->questions->map(function($q) {
+const existingQuestions = {!! json_encode($quiz->questions->map(function($q) {
     return [
         'question'   => $q->question,
         'type'       => $q->type,
@@ -148,7 +161,7 @@ const existingQuestions = @json($quiz->questions->map(function($q) {
         'options'    => $q->options->map(fn($o) => ['option_text' => $o->option_text, 'is_correct' => $o->is_correct])->toArray(),
         'correct_answer' => $q->options->where('is_correct', true)->first()?->option_text ?? '',
     ];
-})->toArray());
+})->toArray()) !!};
 
 let questionCount = 0;
 

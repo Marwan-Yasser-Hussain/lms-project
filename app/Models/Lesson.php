@@ -44,12 +44,18 @@ class Lesson extends Model
 
         // YouTube
         if (preg_match('/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/', $url, $m)) {
-            return 'https://www.youtube.com/embed/' . $m[1];
+            return 'https://www.youtube.com/embed/' . $m[1] . '?modestbranding=1&rel=0&iv_load_policy=3&showinfo=0&controls=0&disablekb=1';
         }
 
         // Vimeo
         if (preg_match('/vimeo\.com\/(\d+)/', $url, $m)) {
             return 'https://player.vimeo.com/video/' . $m[1];
+        }
+
+        // Dailymotion
+        if (preg_match('/dailymotion\.com\/video\/([a-zA-Z0-9]+)/', $url, $m)) {
+            // Added flags to try and minimize UI: ui-logo=0, ui-start-screen-info=0
+            return 'https://www.dailymotion.com/embed/video/' . $m[1] . '?ui-logo=0&ui-start-screen-info=0&sharing-enable=0';
         }
 
         // Google Drive
@@ -59,4 +65,49 @@ class Lesson extends Model
 
         return $url; // fallback — direct embed
     }
+
+    /**
+     * Get the video provider (youtube or vimeo) for Plyr.
+     */
+    public function getVideoProviderAttribute(): ?string
+    {
+        if (!$this->video_url) return null;
+
+        if (preg_match('/(?:youtube\.com\/watch\?v=|youtu\.be\/)[a-zA-Z0-9_-]+/', $this->video_url)) {
+            return 'youtube';
+        }
+
+        if (preg_match('/vimeo\.com\/\d+/', $this->video_url)) {
+            return 'vimeo';
+        }
+
+        if (preg_match('/dailymotion\.com\/video\/[a-zA-Z0-9]+/', $this->video_url)) {
+            return 'dailymotion';
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the extracted video ID for Plyr.
+     */
+    public function getVideoIdAttribute(): ?string
+    {
+        if (!$this->video_url) return null;
+
+        if (preg_match('/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/', $this->video_url, $m)) {
+            return $m[1];
+        }
+
+        if (preg_match('/vimeo\.com\/(\d+)/', $this->video_url, $m)) {
+            return $m[1];
+        }
+
+        if (preg_match('/dailymotion\.com\/video\/([a-zA-Z0-9]+)/', $this->video_url, $m)) {
+            return $m[1];
+        }
+
+        return null;
+    }
 }
+

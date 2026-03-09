@@ -5,14 +5,28 @@
 
 @section('content')
 
-<div class="page-header">
-    <div>
-        <h1 class="page-title">{{ $course->title }}</h1>
-        <p class="page-subtitle">Manage lessons and quizzes for this course.</p>
-    </div>
-    <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
-        <a href="{{ route('admin.courses.edit', $course) }}" class="btn btn-secondary">✏️ Edit Course</a>
-        <a href="{{ route('admin.courses.index') }}" class="btn btn-secondary">← All Courses</a>
+{{-- Welcome/Header Banner --}}
+<div class="mb-8 rounded-2xl relative overflow-hidden animate-fade-up"
+     style="background: linear-gradient(135deg, #1A1262 0%, #0F043D 100%); border: 1px solid rgba(255,255,255,0.05);">
+    <div class="absolute -top-24 right-10 w-64 h-64 bg-[#ff80c8] rounded-full mix-blend-screen filter blur-[90px] opacity-20 pointer-events-none"></div>
+
+    <div class="relative p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 z-10 w-full flex-wrap">
+        <div>
+            <h1 class="text-3xl font-black text-white mb-2 tracking-tight">{{ $course->title }}</h1>
+            <p class="text-white/60 text-sm md:text-base max-w-xl leading-relaxed">
+                Manage lessons and quizzes for this course.
+            </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+            <a href="{{ route('admin.courses.edit', $course) }}" class="btn text-white transition-opacity hover:opacity-90 px-4"
+               style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);">
+               ✏️ Edit Course
+            </a>
+            <a href="{{ route('admin.courses.index') }}" class="btn text-white transition-opacity hover:opacity-90 px-4"
+               style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);">
+               ← All Courses
+            </a>
+        </div>
     </div>
 </div>
 
@@ -168,7 +182,7 @@
                             {{-- ══ STANDALONE QUIZ ROW ══ --}}
                             @else
                                 @php $quiz = $entry['item']; @endphp
-                                <div class="curriculum-item" data-type="quiz"
+                                <div class="curriculum-item" data-id="{{ $quiz->id }}" data-type="quiz"
                                      style="background:rgba(147,0,86,0.07);border:1px solid rgba(147,0,86,0.2);border-radius:12px;padding:1rem 1.25rem;display:flex;align-items:center;gap:1rem;">
 
                                     <div style="color:rgba(255,255,255,0.2);font-size:1.1rem;flex-shrink:0;">⋮⋮</div>
@@ -309,19 +323,34 @@
 
 @push('scripts')
 <script>
-// Drag-to-reorder (HTML5 Drag API — lessons only)
+// Drag-to-reorder (HTML5 Drag API — lessons + standalone quizzes)
 (function () {
     const list = document.getElementById('curriculum-list');
     if (!list) return;
     let dragged = null;
 
-    list.querySelectorAll('.curriculum-item[data-type="lesson"]').forEach(item => {
+    list.querySelectorAll('.curriculum-item').forEach(item => {
         item.setAttribute('draggable', 'true');
-        item.addEventListener('dragstart', () => { dragged = item; item.style.opacity = '0.45'; });
-        item.addEventListener('dragend',   () => { dragged = null; item.style.opacity = '1'; });
-        item.addEventListener('dragover',  e => { e.preventDefault(); });
+        item.style.cursor = 'grab';
+
+        item.addEventListener('dragstart', () => {
+            dragged = item;
+            item.style.opacity = '0.45';
+        });
+        item.addEventListener('dragend', () => {
+            dragged = null;
+            item.style.opacity = '1';
+        });
+        item.addEventListener('dragover', e => {
+            e.preventDefault();
+            item.style.outline = '2px dashed rgba(255,255,255,0.25)';
+        });
+        item.addEventListener('dragleave', () => {
+            item.style.outline = 'none';
+        });
         item.addEventListener('drop', e => {
             e.preventDefault();
+            item.style.outline = 'none';
             if (dragged && dragged !== item) {
                 const items = [...list.querySelectorAll('.curriculum-item')];
                 const dragIdx = items.indexOf(dragged);
@@ -334,12 +363,16 @@
     });
 
     function saveOrder() {
-        const lessonItems = [...list.querySelectorAll('.curriculum-item[data-type="lesson"]')];
-        const ids = lessonItems.map(el => el.dataset.id);
-        fetch('{{ route('admin.courses.lessons.reorder', $course) }}', {
+        const items = [...list.querySelectorAll('.curriculum-item')];
+        const order = items.map((el, idx) => ({
+            type: el.dataset.type,
+            id:   el.dataset.id,
+            position: idx + 1
+        }));
+        fetch('{{ route('admin.courses.curriculum.reorder', $course) }}', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-            body: JSON.stringify({ order: ids })
+            body: JSON.stringify({ order: order })
         });
     }
 })();

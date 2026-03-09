@@ -15,6 +15,8 @@ use App\Http\Controllers\Admin\CertificateController;
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login')->middleware('guest');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
+Route::get('/register', [AuthController::class, 'showRegister'])->name('register')->middleware('guest');
+Route::post('/register', [AuthController::class, 'register'])->name('register.post');
 
 // ── Home (placeholder until student dashboard is built) ──────────────────────
 Route::get('/', function () {
@@ -30,12 +32,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     // Courses — full resource + custom show
     Route::get('/courses/export/excel', [CourseController::class, 'exportExcel'])->name('courses.export.excel');
     Route::get('/courses/export/pdf',   [CourseController::class, 'exportPdf'])->name('courses.export.pdf');
+    Route::delete('/courses/bulk-delete', [CourseController::class, 'bulkDelete'])->name('courses.bulk-delete');
     Route::resource('courses', CourseController::class);
 
     // Lessons (nested under a course)
     Route::resource('courses.lessons', LessonController::class)->except(['index', 'show']);
     Route::post('/courses/{course}/lessons/reorder', [LessonController::class, 'reorder'])
          ->name('courses.lessons.reorder');
+    Route::post('/courses/{course}/curriculum/reorder', [CourseController::class, 'reorderCurriculum'])
+         ->name('courses.curriculum.reorder');
 
     // Quizzes (nested under a course)
     Route::resource('courses.quizzes', QuizController::class)->except(['index', 'show']);
@@ -50,6 +55,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     // Users
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
     Route::post('/users', [UserController::class, 'store'])->name('users.store');
+    Route::delete('/users/bulk-delete', [UserController::class, 'bulkDelete'])->name('users.bulk-delete');
     Route::get('/users/export/excel', [UserController::class, 'exportExcel'])->name('users.export.excel');
     Route::get('/users/export/pdf',   [UserController::class, 'exportPdf'])->name('users.export.pdf');
     Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');

@@ -77,10 +77,14 @@
                 {{-- Submit --}}
                 <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding-top:0.75rem;padding-bottom:0.75rem;">
                     Sign In
-                    <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg style="width:16px;height:16px;margin-left:.5rem" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                     </svg>
                 </button>
+                
+                <div style="text-align:center;margin-top:1rem;">
+                    <a href="{{ route('register') }}" style="color:#f472b6;font-size:0.85rem;text-decoration:none;">Don't have an account? Sign up</a>
+                </div>
             </form>
         </div>
 

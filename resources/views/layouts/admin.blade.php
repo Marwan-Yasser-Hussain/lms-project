@@ -7,6 +7,9 @@
     <title>@yield('title', 'Dashboard') — LMS Project Admin</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
+    
+    <!-- Plyr CSS -->
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 </head>
 <body class="h-full">
 
@@ -187,7 +190,7 @@
         </main>
 
         {{-- FOOTER --}}
-        <footer class="px-6 py-4 text-center" style="color:rgba(255,255,255,0.2);font-size:0.75rem;border-top:1px solid var(--color-border);">
+        <footer class="px-6 py-4 text-center" style="color:rgba(15,4,61,0.3);font-size:0.75rem;border-top:1px solid rgba(15,4,61,0.08);">
             © {{ date('Y') }} LMS Project. All rights reserved.
         </footer>
     </div>
@@ -205,6 +208,10 @@
             document.getElementById('sidebar-backdrop').classList.remove('show');
         }
     </script>
+    
+    <!-- Plyr JS -->
+    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+
     @stack('scripts')
 </body>
 </html>

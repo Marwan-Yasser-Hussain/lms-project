@@ -39,9 +39,8 @@
 
 body {
     font-family: var(--font-sans);
-    background: linear-gradient(to bottom right, #0F043D 0%, #920056 100%);
-    background-attachment: fixed;
-    color: #e2e8f0;
+    background: #F0F5FF;
+    color: #1e2a3a;
     margin: 0;
     padding: 0;
 }
@@ -53,7 +52,7 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-    background: #0F043D;
+    background: #e4ecf7;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -173,6 +172,83 @@ body {
 .main-content {
     flex: 1;
     padding: 2rem;
+    background: #F0F5FF;
+}
+
+/* ── Light-theme text overrides ────────────────────────────────────────────
+   Tailwind's `text-white` has high specificity. We override it in the main
+   content area so headings/labels on the white background become dark navy.
+   Then we restore white inside any element that has a dark background.
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* 1. Any "text-white" directly in the content area → dark navy */
+.main-content .text-white {
+    color: #0F043D !important;
+}
+
+/* 2. Restore white inside dark containers (cards, stat-cards, banners, modals) */
+.main-content .card .text-white,
+.main-content .stat-card .text-white,
+.main-content [style*="background: linear-gradient"] .text-white,
+.main-content [style*="background:linear-gradient"] .text-white,
+.main-content [style*="background: linear-gradient"] .text-white\/40,
+.main-content [style*="background: linear-gradient"] .text-white\/50,
+.main-content [style*="background: linear-gradient"] .text-white\/60,
+.main-content [style*="background: rgba"] .text-white {
+    color: #fff !important;
+}
+
+/* 3. Opacity-variant classes (text-white/40, text-white/50, etc.) in main area → tinted navy */
+.main-content .text-white\/40 {
+    color: rgba(15, 4, 61, 0.4) !important;
+}
+
+.main-content .text-white\/50 {
+    color: rgba(15, 4, 61, 0.5) !important;
+}
+
+.main-content .text-white\/60 {
+    color: rgba(15, 4, 61, 0.6) !important;
+}
+
+.main-content .text-white\/30 {
+    color: rgba(15, 4, 61, 0.3) !important;
+}
+
+/* 4. Restore opacity variants inside dark containers */
+.main-content .card .text-white\/40,
+.main-content .stat-card .text-white\/40,
+.main-content [style*="background: linear-gradient"] .text-white\/40,
+.main-content [style*="background:linear-gradient"] .text-white\/40 {
+    color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.main-content .card .text-white\/50,
+.main-content .stat-card .text-white\/50,
+.main-content [style*="background: linear-gradient"] .text-white\/50,
+.main-content [style*="background:linear-gradient"] .text-white\/50 {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.main-content .card .text-white\/60,
+.main-content .stat-card .text-white\/60,
+.main-content [style*="background: linear-gradient"] .text-white\/60,
+.main-content [style*="background:linear-gradient"] .text-white\/60 {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.main-content .card .text-white\/70,
+.main-content .stat-card .text-white\/70,
+.main-content [style*="background: linear-gradient"] .text-white\/70,
+.main-content [style*="background:linear-gradient"] .text-white\/70 {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.main-content .card .text-white\/30,
+.main-content .stat-card .text-white\/30,
+.main-content [style*="background: linear-gradient"] .text-white\/30,
+.main-content [style*="background:linear-gradient"] .text-white\/30 {
+    color: rgba(255, 255, 255, 0.3) !important;
 }
 
 /* ── Cards ─────────────────────────────────────────────────────────────── */
@@ -180,6 +256,7 @@ body {
     background: linear-gradient(135deg, #160D50 0%, #120A42 100%);
     border: 1px solid var(--color-border);
     border-radius: 16px;
+    color: #e2e8f0;
 }
 
 .card-inner {
@@ -195,6 +272,7 @@ body {
     position: relative;
     overflow: hidden;
     transition: transform 0.2s, border-color 0.2s;
+    color: #e2e8f0;
 }
 
 .stat-card:hover {
@@ -307,7 +385,7 @@ body {
 
 .btn-secondary {
     background: rgba(255, 255, 255, 0.06);
-    color: rgba(255, 255, 255, 0.8);
+    color: #e2e8f0;
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -392,21 +470,22 @@ body {
 
 .data-table th {
     text-align: left;
-    padding: 0.75rem 1rem;
+    padding: 1.25rem 1rem;
     font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.35);
+    color: rgba(255, 255, 255, 0.7);
     border-bottom: 1px solid var(--color-border);
     white-space: nowrap;
 }
 
 .data-table td {
-    padding: 0.85rem 1rem;
+    padding: 1.25rem 1rem;
     border-bottom: 1px solid var(--color-border);
     font-size: 0.875rem;
     vertical-align: middle;
+    color: #e2e8f0;
 }
 
 .data-table tr:last-child td {
@@ -478,13 +557,13 @@ body {
 .page-title {
     font-size: 1.6rem;
     font-weight: 800;
-    color: #fff;
+    color: #0F043D;
     line-height: 1.2;
 }
 
 .page-subtitle {
     font-size: 0.875rem;
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(15, 4, 61, 0.45);
     margin-top: 0.2rem;
 }
 
@@ -602,4 +681,60 @@ body {
 
 .delay-6 {
     animation-delay: 0.30s;
+}
+
+/* ── Bulk Select ────────────────────────────────────────────────────────── */
+.bulk-checkbox {
+    width: 16px;
+    height: 16px;
+    accent-color: #930056;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.bulk-bar {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(120%);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: linear-gradient(135deg, #1A1262, #0F043D);
+    border: 1px solid rgba(147, 0, 86, 0.4);
+    border-radius: 14px;
+    padding: 0.75rem 1.25rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+    white-space: nowrap;
+}
+
+.bulk-bar.visible {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.bulk-bar-count {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #fff;
+    padding: 0.3rem 0.75rem;
+    background: rgba(147, 0, 86, 0.25);
+    border-radius: 8px;
+    border: 1px solid rgba(147, 0, 86, 0.4);
+}
+
+.bulk-bar-label {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.data-table tr.row-selected {
+    background: rgba(147, 0, 86, 0.07) !important;
+    outline: 1px solid rgba(147, 0, 86, 0.2);
+    outline-offset: -1px;
 }

@@ -5,22 +5,33 @@
 
 @section('content')
 
-<div class="page-header">
-    <div class="flex items-center gap-4">
-        <img src="{{ $user->avatar_url }}" alt="" class="avatar-lg rounded-full" />
-        <div>
-            <h1 class="page-title">{{ $user->name }}</h1>
-            <p class="page-subtitle">{{ $user->email }}</p>
+{{-- Welcome/Header Banner --}}
+<div class="mb-8 rounded-2xl relative overflow-hidden animate-fade-up"
+     style="background: linear-gradient(135deg, #1A1262 0%, #0F043D 100%); border: 1px solid rgba(255,255,255,0.05);">
+    <div class="absolute -top-24 right-10 w-64 h-64 bg-[#ff80c8] rounded-full mix-blend-screen filter blur-[90px] opacity-20 pointer-events-none"></div>
+
+    <div class="relative p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 z-10 w-full flex-wrap">
+        <div class="flex items-center gap-4">
+            <img src="{{ $user->avatar_url }}" alt="" class="avatar-lg rounded-full" />
+            <div>
+                <h1 class="text-3xl font-black text-white mb-2 tracking-tight">{{ $user->name }}</h1>
+                <p class="text-white/60 text-sm md:text-base max-w-xl leading-relaxed">
+                    {{ $user->email }}
+                </p>
+            </div>
         </div>
-    </div>
-    <div class="flex gap-2">
-        <form method="POST" action="{{ route('admin.users.toggle-status', $user) }}">
-            @csrf
-            <button type="submit" class="btn {{ $user->is_active ? 'btn-danger' : 'btn-sky' }}">
-                {{ $user->is_active ? 'Deactivate Account' : 'Activate Account' }}
-            </button>
-        </form>
-        <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">← Back</a>
+        <div class="flex flex-wrap items-center gap-3">
+            <form method="POST" action="{{ route('admin.users.toggle-status', $user) }}">
+                @csrf
+                <button type="submit" class="btn {{ $user->is_active ? 'btn-danger' : 'btn-sky' }}">
+                    {{ $user->is_active ? 'Deactivate Account' : 'Activate Account' }}
+                </button>
+            </form>
+            <a href="{{ route('admin.users.index') }}" class="btn text-white transition-opacity hover:opacity-90 px-4"
+               style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);">
+               ← Back
+            </a>
+        </div>
     </div>
 </div>
 

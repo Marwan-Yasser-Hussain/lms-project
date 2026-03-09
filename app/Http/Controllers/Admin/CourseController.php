@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\Category;
+use App\Models\Lesson;
+use App\Models\Quiz;
 use App\Exports\CoursesExport;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -174,9 +176,49 @@ class CourseController extends Controller
         return redirect()->route('admin.courses.index')->with('success', 'Course updated successfully!');
     }
 
+    public function reorderCurriculum(Request $request, Course $course)
+    {
+        $request->validate([
+            'order'          => 'required|array',
+            'order.*.type'   => 'required|in:lesson,quiz',
+            'order.*.id'     => 'required|integer',
+            'order.*.position' => 'required|integer',
+        ]);
+
+        foreach ($request->order as $entry) {
+            $position = (int) $entry['position'];
+            $id       = (int) $entry['id'];
+
+            if ($entry['type'] === 'lesson') {
+                Lesson::where('id', $id)
+                      ->where('course_id', $course->id)
+                      ->update(['order' => $position]);
+            } else {
+                Quiz::where('id', $id)
+                    ->where('course_id', $course->id)
+                    ->update(['order' => $position]);
+            }
+        }
+
+        return response()->json(['success' => true]);
+    }
+
     public function destroy(Course $course)
     {
         $course->delete();
         return redirect()->route('admin.courses.index')->with('success', 'Course deleted.');
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $ids = array_filter(explode(',', $request->input('ids', '')), 'is_numeric');
+
+        if (empty($ids)) {
+            return back()->with('error', 'No courses selected.');
+        }
+
+        $count = Course::whereIn('id', $ids)->delete();
+
+        return back()->with('success', "{$count} course(s) deleted successfully.");
     }
 }
