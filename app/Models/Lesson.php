@@ -44,7 +44,7 @@ class Lesson extends Model
 
         // YouTube
         if (preg_match('/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/', $url, $m)) {
-            return 'https://www.youtube.com/embed/' . $m[1] . '?modestbranding=1&rel=0&iv_load_policy=3&showinfo=0&controls=0&disablekb=1';
+            return 'https://www.youtube.com/embed/' . $m[1] . '?autoplay=1&mute=1&loop=1&controls=0&color=white&modestbranding=0&rel=0&playsinline=1&enablejsapi=1&playlist=' . $m[1];
         }
 
         // Vimeo

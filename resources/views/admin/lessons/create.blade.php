@@ -56,8 +56,10 @@
                         @error('video_url')<p class="text-xs mt-1" style="color:#ff80c8;">{{ $message }}</p>@enderror
 
                         {{-- Live preview --}}
-                        <div id="video-preview" style="display:none;margin-top:1rem;border-radius:12px;overflow:hidden;aspect-ratio:16/9;">
-                            <div id="player"></div>
+                        <div id="video-preview" style="display:none;margin-top:1rem;">
+                            <div class="yt-embed-holder">
+                                <div id="player"></div>
+                            </div>
                         </div>
                     </div>
 
@@ -133,10 +135,12 @@
     }
 
     let timer;
+    let embedEl = document.getElementById('player');
+    let initId = embedEl && embedEl.hasAttribute('data-plyr-embed-id') ? embedEl.getAttribute('data-plyr-embed-id') : null;
     let player = new Plyr('#player', {
         controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen'],
         settings: ['quality', 'speed'],
-        youtube: { noCookie: true, rel: 0, showinfo: 0, iv_load_policy: 3, modestbranding: 1, controls: 0, disablekb: 1 },
+        youtube: { autoplay: 1, mute: 1, loop: 1, controls: 0, color: 'white', modestbranding: 0, rel: 0, playsinline: 1, enablejsapi: 1, playlist: initId },
         vimeo: { byline: false, portrait: false, title: false, transparent: false }
     });
 
@@ -158,7 +162,7 @@
                         player = new Plyr('#player', {
                             controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen'],
                             settings: ['quality', 'speed'],
-                            youtube: { noCookie: true, rel: 0, showinfo: 0, iv_load_policy: 3, modestbranding: 1, controls: 0, disablekb: 1 },
+                            youtube: { autoplay: 1, mute: 1, loop: 1, controls: 0, color: 'white', modestbranding: 0, rel: 0, playsinline: 1, enablejsapi: 1, playlist: videoData.id },
                             vimeo: { byline: false, portrait: false, title: false, transparent: false }
                         });
                     }

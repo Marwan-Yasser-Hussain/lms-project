@@ -50,17 +50,19 @@
                         </p>
                         <input type="text" name="video_url" value="{{ old('video_url', $lesson->video_url) }}" id="video-url-input"
                                class="form-input" placeholder="https://www.youtube.com/watch?v=..." />
-                        <div id="video-preview" style="display:{{ $lesson->video_url ? 'block' : 'none' }};margin-top:1rem;border-radius:12px;overflow:hidden;aspect-ratio:16/9;">
-                            @if($lesson->video_provider)
-                                <div id="player" data-plyr-provider="{{ $lesson->video_provider }}" data-plyr-embed-id="{{ $lesson->video_id }}"></div>
-                            @elseif($lesson->video_url)
-                                <div class="plyr__video-embed" id="player">
-                                    <iframe id="video-frame" src="{{ $lesson->embed_url ?? '' }}" allow="autoplay;encrypted-media" allowfullscreen
-                                            style="width:100%;height:100%;border:none;border-radius:12px;"></iframe>
-                                </div>
-                            @else
-                                <div id="player"></div>
-                            @endif
+                        <div id="video-preview" style="display:{{ $lesson->video_url ? 'block' : 'none' }};margin-top:1rem;">
+                            <div class="yt-embed-holder">
+                                @if($lesson->video_provider)
+                                    <div id="player" data-plyr-provider="{{ $lesson->video_provider }}" data-plyr-embed-id="{{ $lesson->video_id }}"></div>
+                                @elseif($lesson->video_url)
+                                    <div class="plyr__video-embed" id="player">
+                                        <iframe id="video-frame" src="{{ $lesson->embed_url ?? '' }}" allow="autoplay;encrypted-media" allowfullscreen
+                                                style="width:100%;height:100%;border:none;"></iframe>
+                                    </div>
+                                @else
+                                    <div id="player"></div>
+                                @endif
+                            </div>
                         </div>
                     </div>
 
@@ -130,10 +132,12 @@
     }
 
     let timer;
+    let embedEl = document.getElementById('player');
+    let initId = embedEl && embedEl.hasAttribute('data-plyr-embed-id') ? embedEl.getAttribute('data-plyr-embed-id') : null;
     let player = new Plyr('#player', {
         controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen'],
         settings: ['quality', 'speed'],
-        youtube: { noCookie: true, rel: 0, showinfo: 0, iv_load_policy: 3, modestbranding: 1, controls: 0, disablekb: 1 },
+        youtube: { autoplay: 1, mute: 1, loop: 1, controls: 0, color: 'white', modestbranding: 0, rel: 0, playsinline: 1, enablejsapi: 1, playlist: initId },
         vimeo: { byline: false, portrait: false, title: false, transparent: false }
     });
 
@@ -145,19 +149,20 @@
             
             if (videoData) { 
                 preview.style.display = 'block'; 
+                const embedHolder = preview.querySelector('.yt-embed-holder') || preview;
                 
                 if (videoData.provider === 'dailymotion') {
                     // Plyr does not support Dailymotion, so we fallback to a standard iframe
                     if (player) { player.destroy(); player = null; }
-                    preview.innerHTML = `<iframe src="https://www.dailymotion.com/embed/video/${videoData.id}?ui-logo=0&ui-start-screen-info=0&sharing-enable=0" allow="autoplay;fullscreen" style="width:100%;height:100%;border:none;border-radius:12px;"></iframe>`;
+                    embedHolder.innerHTML = `<iframe src="https://www.dailymotion.com/embed/video/${videoData.id}?ui-logo=0&ui-start-screen-info=0&sharing-enable=0" allow="autoplay;fullscreen" style="width:100%;height:100%;border:none;border-radius:12px;"></iframe>`;
                 } else {
                     // Ensure player container is intact
                     if (!player) {
-                        preview.innerHTML = `<div id="player"></div>`;
+                        embedHolder.innerHTML = `<div id="player"></div>`;
                         player = new Plyr('#player', {
                             controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen'],
                             settings: ['quality', 'speed'],
-                            youtube: { noCookie: true, rel: 0, showinfo: 0, iv_load_policy: 3, modestbranding: 1, controls: 0, disablekb: 1 },
+                            youtube: { autoplay: 1, mute: 1, loop: 1, controls: 0, color: 'white', modestbranding: 0, rel: 0, playsinline: 1, enablejsapi: 1, playlist: videoData.id },
                             vimeo: { byline: false, portrait: false, title: false, transparent: false }
                         });
                     }
@@ -176,7 +181,8 @@
             else { 
                 // Fallback or hide
                 preview.style.display = 'none'; 
-                preview.innerHTML = `<div id="player"></div>`;
+                const embedHolder = preview.querySelector('.yt-embed-holder') || preview;
+                embedHolder.innerHTML = `<div id="player"></div>`;
                 if (player) { player.destroy(); player = null; }
             }
         }, 600);

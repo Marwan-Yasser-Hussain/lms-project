@@ -10,6 +10,27 @@
     
     <!-- Plyr CSS -->
     <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    
+    <style>
+        /* CSS Hack to crop out forced YouTube UI elements */
+        .yt-embed-holder {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+            border-radius: 12px;
+        }
+        
+        .yt-embed-holder iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 300%;
+            height: 100%;
+            margin-left: -100%; /* Centers the 300% wide video back in the middle */
+            border: none;
+        }
+    </style>
 </head>
 <body class="h-full">
 
