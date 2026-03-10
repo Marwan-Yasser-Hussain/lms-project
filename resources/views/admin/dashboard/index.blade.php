@@ -13,7 +13,7 @@
 
     <div class="relative p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6 z-10">
         <div>
-            <h1 class="text-3xl font-black text-white mb-2 tracking-tight">Welcome back, {{ auth()->user()->name }} 👋</h1>
+            <h1 class="text-3xl font-black mb-2 tracking-tight text-white">Welcome back, {{ auth()->user()->name }} 👋</h1>
             <p class="text-white/60 text-sm md:text-base max-w-xl leading-relaxed">
                 Here's what's happening with your platform today. Check out the latest enrollments, and student activities below.
             </p>
@@ -107,7 +107,7 @@
         <div class="card-inner">
             <div class="flex justify-between items-center mb-6">
                 <div>
-                    <h2 class="font-bold text-white text-lg">Revenue Overview</h2>
+                    <h2 class="font-bold text-lg">Revenue Overview</h2>
                     <p class="text-xs text-white/40">Income over the last 6 months</p>
                 </div>
             </div>
@@ -122,7 +122,7 @@
         <div class="card-inner">
             <div class="flex justify-between items-center mb-6">
                 <div>
-                    <h2 class="font-bold text-white text-lg">Student Enrollments</h2>
+                    <h2 class="font-bold text-lg">Student Enrollments</h2>
                     <p class="text-xs text-white/40">New course enrollments over time</p>
                 </div>
             </div>
@@ -141,7 +141,7 @@
     <div class="card">
         <div class="card-inner pb-0">
             <div class="flex items-center justify-between mb-4">
-                <h2 class="font-bold text-white text-lg">Latest Students</h2>
+                <h2 class="font-bold text-lg">Latest Students</h2>
             </div>
         </div>
         <div class="overflow-x-auto pb-4">
@@ -186,7 +186,7 @@
     <div class="card">
         <div class="card-inner pb-0">
             <div class="flex items-center justify-between mb-4">
-                <h2 class="font-bold text-white text-lg">Newly Added Courses</h2>
+                <h2 class="font-bold text-lg">Newly Added Courses</h2>
             </div>
         </div>
         <div class="overflow-x-auto pb-4">

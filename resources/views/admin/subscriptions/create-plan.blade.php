@@ -12,7 +12,7 @@
 
     <div class="relative p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 z-10">
         <div>
-            <h1 class="text-3xl font-black text-white mb-2 tracking-tight">New Subscription Plan</h1>
+            <h1 class="text-3xl font-black mb-2 tracking-tight text-white">New Subscription Plan</h1>
             <p class="text-white/60 text-sm md:text-base max-w-xl leading-relaxed">
                 Create a new pricing tier for your platform. Define duration, cost, and features.
             </p>
@@ -33,7 +33,7 @@
             <div class="w-10 h-10 rounded-xl bg-[#e0b0ff]/10 flex items-center justify-center text-[#e0b0ff]">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
             </div>
-            <h2 class="text-xl font-bold text-white tracking-tight">Plan Details</h2>
+            <h2 class="text-xl font-bold tracking-tight">Plan Details</h2>
         </div>
 
         <form method="POST" action="{{ route('admin.subscriptions.plans.store') }}">

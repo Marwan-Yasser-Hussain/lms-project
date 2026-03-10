@@ -12,7 +12,7 @@
 
     <div class="relative p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 z-10 w-full flex-wrap">
         <div>
-            <h1 class="text-3xl font-black text-white mb-2 tracking-tight">🏆 Certificate Editor</h1>
+            <h1 class="text-3xl font-black mb-2 tracking-tight text-white">🏆 Certificate Editor</h1>
             <p class="text-white/60 text-sm md:text-base max-w-xl leading-relaxed">
                 {{ $course->title }}
             </p>
@@ -53,7 +53,7 @@
         <div class="xl:col-span-2">
             <div class="card">
                 <div class="card-inner">
-                    <h2 class="font-bold text-white mb-4">📐 Visual Editor</h2>
+                    <h2 class="font-bold mb-4">📐 Visual Editor</h2>
                     <p style="color:rgba(255,255,255,0.4);font-size:0.82rem;margin-bottom:1rem;">
                         Upload a certificate background, then <strong style="color:#a78bfa;">click or drag</strong> on the image to position where the student's name should appear.
                     </p>

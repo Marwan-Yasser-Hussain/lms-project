@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Course extends Model
 {
     protected $fillable = [
-        'category_id', 'created_by', 'title', 'slug', 'description', 'whatyoulearn',
+        'category_id', 'sub_category_id', 'created_by', 'title', 'slug', 'description', 'whatyoulearn',
         'thumbnail', 'preview_video_url', 'instructor_name', 'instructor_avatar',
         'level', 'duration_hours', 'total_lessons', 'language', 'status',
         'has_certificate', 'enrolled_count',
@@ -27,6 +27,11 @@ class Course extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function subCategory(): BelongsTo
+    {
+        return $this->belongsTo(SubCategory::class, 'sub_category_id');
     }
 
     public function creator(): BelongsTo

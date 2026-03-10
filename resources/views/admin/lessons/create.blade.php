@@ -12,7 +12,7 @@
 
     <div class="relative p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 z-10 w-full flex-wrap">
         <div>
-            <h1 class="text-3xl font-black text-white mb-2 tracking-tight">Add Lesson</h1>
+            <h1 class="text-3xl font-black mb-2 tracking-tight text-white">Add Lesson</h1>
             <p class="text-white/60 text-sm md:text-base max-w-xl leading-relaxed">
                 {{ $course->title }}
             </p>
@@ -37,7 +37,7 @@
             {{-- Lesson Info --}}
             <div class="card">
                 <div class="card-inner">
-                    <h2 class="font-bold text-white mb-4">Lesson Details</h2>
+                    <h2 class="font-bold mb-4">Lesson Details</h2>
 
                     <div class="mb-4">
                         <label class="form-label">Lesson Title *</label>
@@ -85,7 +85,7 @@
 
             <div class="card">
                 <div class="card-inner">
-                    <h2 class="font-bold text-white mb-4">Settings</h2>
+                    <h2 class="font-bold mb-4">Settings</h2>
 
                     <div class="mb-4">
                         <label class="form-label">Duration (minutes)</label>

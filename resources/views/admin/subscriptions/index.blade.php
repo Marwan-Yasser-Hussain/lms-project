@@ -12,7 +12,7 @@
 
     <div class="relative p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 z-10">
         <div>
-            <h1 class="text-3xl font-black text-white mb-2 tracking-tight">Subscriptions</h1>
+            <h1 class="text-3xl font-black mb-2 tracking-tight text-white">Subscriptions</h1>
             <p class="text-white/60 text-sm md:text-base max-w-xl leading-relaxed">
                 Manage your platform's subscription tiers and monitor active student plans.
             </p>
@@ -30,7 +30,7 @@
 
 {{-- ── Plans Grid ─────────────────────────────────────────────────────────── --}}
 <div class="flex items-center justify-between mb-6 animate-fade-up delay-1">
-    <h2 class="text-xl font-bold text-white tracking-tight">Available Plans</h2>
+    <h2 class="text-xl font-bold tracking-tight">Available Plans</h2>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-10">
@@ -103,7 +103,7 @@
 
 {{-- ── User Subscriptions Table ───────────────────────────────────────────── --}}
 <div class="flex items-center justify-between mb-6 animate-fade-up delay-3">
-    <h2 class="text-xl font-bold text-white tracking-tight">Active & Past Subscriptions</h2>
+    <h2 class="text-xl font-bold tracking-tight">Active & Past Subscriptions</h2>
 </div>
 
 {{-- Filter/Search card --}}

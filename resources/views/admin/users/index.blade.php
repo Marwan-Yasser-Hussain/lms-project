@@ -6,30 +6,48 @@
 @section('content')
 
 {{-- Welcome/Header Banner --}}
-<div class="mb-8 rounded-2xl relative overflow-hidden animate-fade-up"
+<div class="mb-8 rounded-2xl relative animate-fade-up"
      style="background: linear-gradient(135deg, #1A1262 0%, #0F043D 100%); border: 1px solid rgba(255,255,255,0.05);">
     <div class="absolute -top-24 right-10 w-64 h-64 bg-[#ff80c8] rounded-full mix-blend-screen filter blur-[90px] opacity-20 pointer-events-none"></div>
 
     <div class="relative p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 z-10 w-full flex-wrap">
         <div>
-            <h1 class="text-3xl font-black text-white mb-2 tracking-tight">User Management</h1>
+            <h1 class="text-3xl font-black mb-2 tracking-tight text-white">User Management</h1>
             <p class="text-white/60 text-sm md:text-base max-w-xl leading-relaxed">
                 Manage all registered users and admins, control access, and monitor activity.
             </p>
         </div>
-        <div class="flex flex-wrap items-center gap-3">
-            <a href="{{ route('admin.users.export.pdf', request()->only(['search','role','status'])) }}"
-               class="btn text-white transition-opacity hover:opacity-90 px-4"
-               style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);" title="Export to PDF">
-                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11v6m0 0l-3-3m3 3l3-3" /></svg>
-                PDF
-            </a>
-            <a href="{{ route('admin.users.export.excel', request()->only(['search','role','status'])) }}"
-               class="btn text-white transition-opacity hover:opacity-90 px-4"
-               style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399;" title="Export to Excel">
-                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
-                Excel
-            </a>
+        <div class="flex flex-wrap items-center gap-3 relative z-50">
+            <div class="relative group" id="export-dropdown-container">
+                <button onclick="toggleExportDropdown()" type="button" class="btn text-white transition-opacity hover:opacity-90 px-4 flex items-center gap-2"
+                   style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);" title="Export Options">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                    Export
+                    <svg id="export-chevron" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                </button>
+                
+                <div id="export-dropdown-menu"
+                     class="absolute left-0 mt-2 w-48 rounded-xl shadow-2xl overflow-hidden transition-all duration-200 pointer-events-none opacity-0 translate-y-2" 
+                     style="background: #160D50; border: 1px solid rgba(255,255,255,0.1); z-index: 9999;">
+                    <div class="py-1">
+                        <a href="{{ route('admin.users.export.pdf', request()->only(['search','role','status'])) }}"
+                           class="flex items-center px-4 py-2.5 text-sm text-white/80 hover:text-white hover:bg-white/5 transition-colors">
+                            <svg class="w-4 h-4 mr-3 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11v6m0 0l-3-3m3 3l3-3" /></svg>
+                            Export as PDF
+                        </a>
+                        <a href="{{ route('admin.users.export.excel', request()->only(['search','role','status'])) }}"
+                           class="flex items-center px-4 py-2.5 text-sm text-white/80 hover:text-white hover:bg-white/5 transition-colors">
+                            <svg class="w-4 h-4 mr-3 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                            Export as Excel
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="btn text-white transition-opacity hover:opacity-90 px-4"
+               style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); color: #60a5fa;" title="Import from Excel">
+                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                Import
+            </button>
             <button onclick="openAddUserModal()" class="btn btn-primary"
                     style="background: linear-gradient(135deg, #930056, #6d003f); color: #fff; border: 1px solid #ff80c8; box-shadow: 0 4px 14px rgba(147, 0, 86, 0.45);">
                 <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
@@ -376,6 +394,37 @@
     function closeEditUserModal() {
         document.getElementById('editUserModal').style.display = 'none';
     }
+
+    // ── Export Dropdown Toggle ──────────────────────────────────
+    function toggleExportDropdown() {
+        const menu = document.getElementById('export-dropdown-menu');
+        const chevron = document.getElementById('export-chevron');
+        const isOpen = !menu.classList.contains('pointer-events-none');
+        
+        if (isOpen) {
+            menu.classList.add('pointer-events-none', 'opacity-0', 'translate-y-2');
+            menu.classList.remove('opacity-100', 'translate-y-0');
+            chevron.classList.remove('rotate-180');
+        } else {
+            menu.classList.remove('pointer-events-none', 'opacity-0', 'translate-y-2');
+            menu.classList.add('opacity-100', 'translate-y-0');
+            chevron.classList.add('rotate-180');
+        }
+    }
+
+    // Close options dropdown if clicked outside
+    document.addEventListener('click', function(event) {
+        const container = document.getElementById('export-dropdown-container');
+        const menu = document.getElementById('export-dropdown-menu');
+        const chevron = document.getElementById('export-chevron');
+
+        if (container && !container.contains(event.target) && !menu.classList.contains('pointer-events-none')) {
+            menu.classList.add('pointer-events-none', 'opacity-0', 'translate-y-2');
+            menu.classList.remove('opacity-100', 'translate-y-0');
+            chevron.classList.remove('rotate-180');
+        }
+    });
+
 </script>
 
 {{-- Re-open Add modal when add-validation errors exist --}}

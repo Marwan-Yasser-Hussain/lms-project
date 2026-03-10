@@ -14,7 +14,7 @@
         <div class="flex items-center gap-4">
             <img src="{{ $user->avatar_url }}" alt="" class="avatar-lg rounded-full" />
             <div>
-                <h1 class="text-3xl font-black text-white mb-2 tracking-tight">{{ $user->name }}</h1>
+                <h1 class="text-3xl font-black mb-2 tracking-tight text-white">{{ $user->name }}</h1>
                 <p class="text-white/60 text-sm md:text-base max-w-xl leading-relaxed">
                     {{ $user->email }}
                 </p>
@@ -41,7 +41,7 @@
     <div class="flex flex-col gap-5">
         <div class="card">
             <div class="card-inner">
-                <h2 class="font-bold text-white mb-4">Profile</h2>
+                <h2 class="font-bold mb-4">Profile</h2>
                 <div class="flex flex-col gap-3 text-sm">
                     <div class="flex justify-between">
                         <span style="color:rgba(255,255,255,0.4);">Phone</span>
@@ -76,7 +76,7 @@
         {{-- Subscriptions --}}
         <div class="card">
             <div class="card-inner">
-                <h2 class="font-bold text-white mb-4">Subscriptions</h2>
+                <h2 class="font-bold mb-4">Subscriptions</h2>
                 @forelse($user->subscriptions as $sub)
                 <div class="mb-3 p-3 rounded-xl" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);">
                     <div class="flex items-center justify-between mb-1">
@@ -101,7 +101,7 @@
         {{-- Enrollments --}}
         <div class="card">
             <div class="card-inner">
-                <h2 class="font-bold text-white mb-4">Enrolled Courses</h2>
+                <h2 class="font-bold mb-4">Enrolled Courses</h2>
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -139,7 +139,7 @@
         {{-- Certificates --}}
         <div class="card">
             <div class="card-inner">
-                <h2 class="font-bold text-white mb-4">Certificates</h2>
+                <h2 class="font-bold mb-4">Certificates</h2>
                 @forelse($user->certificates as $cert)
                 <div class="flex items-center justify-between p-3 rounded-xl mb-3"
                      style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);">

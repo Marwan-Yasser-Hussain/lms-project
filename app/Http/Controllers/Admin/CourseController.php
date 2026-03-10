@@ -64,7 +64,7 @@ class CourseController extends Controller
 
     public function create()
     {
-        $categories = Category::where('is_active', true)->get();
+        $categories = Category::with('subcategories')->where('is_active', true)->get();
         return view('admin.courses.create', compact('categories'));
     }
 
@@ -73,6 +73,7 @@ class CourseController extends Controller
         $validated = $request->validate([
             'title'             => 'required|string|max:255',
             'category_id'       => 'nullable|exists:categories,id',
+            'sub_category_id'   => 'nullable|exists:sub_categories,id',
             'description'       => 'nullable|string',
             'whatyoulearn'      => 'nullable|string',
             'preview_video_url' => 'nullable|url',
@@ -144,7 +145,7 @@ class CourseController extends Controller
 
     public function edit(Course $course)
     {
-        $categories = Category::where('is_active', true)->get();
+        $categories = Category::with('subcategories')->where('is_active', true)->get();
         return view('admin.courses.edit', compact('course', 'categories'));
     }
 
@@ -153,6 +154,7 @@ class CourseController extends Controller
         $validated = $request->validate([
             'title'             => 'required|string|max:255',
             'category_id'       => 'nullable|exists:categories,id',
+            'sub_category_id'   => 'nullable|exists:sub_categories,id',
             'description'       => 'nullable|string',
             'whatyoulearn'      => 'nullable|string',
             'preview_video_url' => 'nullable|url',

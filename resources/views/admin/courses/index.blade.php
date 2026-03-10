@@ -12,7 +12,7 @@
 
     <div class="relative p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 z-10 w-full flex-wrap">
         <div>
-            <h1 class="text-3xl font-black text-white mb-2 tracking-tight">Browse Courses</h1>
+            <h1 class="text-3xl font-black mb-2 tracking-tight text-white">Browse Courses</h1>
             <p class="text-white/60 text-sm md:text-base max-w-xl leading-relaxed">
                 Manage your complete course catalog, monitor enrollments, and coordinate learning materials.
             </p>
@@ -37,7 +37,7 @@
 </div>
 
 <div class="flex items-center justify-between mb-6 animate-fade-up delay-1">
-    <h2 class="text-xl font-bold text-white tracking-tight">Course Catalog</h2>
+    <h2 class="text-xl font-bold tracking-tight">Course Catalog</h2>
 </div>
 
 {{-- Filters Card --}}

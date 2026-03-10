@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\SubscriptionController;
 use App\Http\Controllers\Admin\LessonController;
 use App\Http\Controllers\Admin\QuizController;
 use App\Http\Controllers\Admin\CertificateController;
+use App\Http\Controllers\Admin\SubCategoryController;
 
 // ── Auth Routes ─────────────────────────────────────────────────────────────
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login')->middleware('guest');
@@ -51,6 +52,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
     // Categories
     Route::resource('categories', CategoryController::class)->except(['show', 'create', 'edit']);
+
+    // Sub-categories (nested under a category)
+    Route::post('/categories/{category}/subcategories', [SubCategoryController::class, 'store'])->name('categories.subcategories.store');
+    Route::put('/categories/{category}/subcategories/{subcategory}', [SubCategoryController::class, 'update'])->name('categories.subcategories.update');
+    Route::delete('/categories/{category}/subcategories/{subcategory}', [SubCategoryController::class, 'destroy'])->name('categories.subcategories.destroy');
 
     // Users
     Route::get('/users', [UserController::class, 'index'])->name('users.index');

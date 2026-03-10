@@ -12,7 +12,7 @@
 
     <div class="relative p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 z-10 w-full flex-wrap">
         <div>
-            <h1 class="text-3xl font-black text-white mb-2 tracking-tight">Add Quiz</h1>
+            <h1 class="text-3xl font-black mb-2 tracking-tight text-white">Add Quiz</h1>
             <p class="text-white/60 text-sm md:text-base max-w-xl leading-relaxed">
                 {{ $course->title }}
             </p>
@@ -48,7 +48,7 @@
             {{-- Quiz Settings --}}
             <div class="card">
                 <div class="card-inner">
-                    <h2 class="font-bold text-white mb-4">Quiz Details</h2>
+                    <h2 class="font-bold mb-4">Quiz Details</h2>
 
                     <div class="mb-4">
                         <label class="form-label">Quiz Title *</label>
@@ -116,7 +116,7 @@
             <div class="card">
                 <div class="card-inner">
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;">
-                        <h2 class="font-bold text-white">Questions</h2>
+                        <h2 class="font-bold ">Questions</h2>
                         <button type="button" onclick="addQuestion()"
                                 style="background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;border:none;border-radius:8px;padding:0.45rem 1rem;font-size:0.82rem;cursor:pointer;">
                             + Add Question
@@ -139,7 +139,7 @@
         <div class="flex flex-col gap-6">
             <div class="card">
                 <div class="card-inner">
-                    <h2 class="font-bold text-white mb-4">Scoring & Limits</h2>
+                    <h2 class="font-bold mb-4">Scoring & Limits</h2>
 
                     <div class="mb-3">
                         <label class="form-label">Passing Score (%)</label>

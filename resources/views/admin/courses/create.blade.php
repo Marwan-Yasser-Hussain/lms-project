@@ -12,7 +12,7 @@
 
     <div class="relative p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 z-10 w-full flex-wrap">
         <div>
-            <h1 class="text-3xl font-black text-white mb-2 tracking-tight">Create Course</h1>
+            <h1 class="text-3xl font-black mb-2 tracking-tight text-white">Create Course</h1>
             <p class="text-white/60 text-sm md:text-base max-w-xl leading-relaxed">
                 Add a new course to the platform.
             </p>
@@ -37,7 +37,7 @@
             {{-- Basic Info --}}
             <div class="card">
                 <div class="card-inner">
-                    <h2 class="font-bold text-white mb-4">Course Details</h2>
+                    <h2 class="font-bold mb-4">Course Details</h2>
 
                     <div class="mb-4">
                         <label class="form-label">Course Title *</label>
@@ -79,7 +79,7 @@
             {{-- Thumbnail --}}
             <div class="card">
                 <div class="card-inner">
-                    <h2 class="font-bold text-white mb-4">Thumbnail</h2>
+                    <h2 class="font-bold mb-4">Thumbnail</h2>
                     <div id="thumb-drop" onclick="document.getElementById('thumbnail-input').click()"
                          style="border:2px dashed rgba(255,255,255,0.1);border-radius:12px;padding:2rem;text-align:center;cursor:pointer;transition:border-color 0.2s;"
                          onmouseover="this.style.borderColor='rgba(147,0,86,0.5)'"
@@ -102,15 +102,22 @@
             {{-- Settings --}}
             <div class="card">
                 <div class="card-inner">
-                    <h2 class="font-bold text-white mb-4">Settings</h2>
+                    <h2 class="font-bold mb-4">Settings</h2>
 
                     <div class="mb-3">
                         <label class="form-label">Category</label>
-                        <select name="category_id" class="form-select">
+                        <select name="category_id" id="category_id" class="form-select" onchange="toggleSubcategories()">
                             <option value="">— Select Category —</option>
                             @foreach($categories as $cat)
-                            <option value="{{ $cat->id }}" {{ old('category_id')==$cat->id?'selected':'' }}>{{ $cat->name }}</option>
+                            <option value="{{ $cat->id }}" data-subs="{{ $cat->subcategories->toJson() }}" {{ old('category_id')==$cat->id?'selected':'' }}>{{ $cat->name }}</option>
                             @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-3 hidden" id="sub_category_container">
+                        <label class="form-label">Sub-category</label>
+                        <select name="sub_category_id" id="sub_category_id" class="form-select">
+                            <option value="">— Select Sub-category —</option>
                         </select>
                     </div>
 
@@ -178,5 +185,45 @@ function previewThumb(input) {
     };
     reader.readAsDataURL(file);
 }
+
+const oldSubCategory = "{{ old('sub_category_id') }}";
+
+function toggleSubcategories() {
+    const catSelect = document.getElementById('category_id');
+    const subContainer = document.getElementById('sub_category_container');
+    const subSelect = document.getElementById('sub_category_id');
+    
+    if (!catSelect || !subContainer || !subSelect) return;
+    
+    const selectedOption = catSelect.options[catSelect.selectedIndex];
+    
+    if (!selectedOption.value) {
+        subContainer.classList.add('hidden');
+        subSelect.innerHTML = '<option value="">— Select Sub-category —</option>';
+        return;
+    }
+
+    const subsData = selectedOption.getAttribute('data-subs');
+    if (subsData) {
+        const subs = JSON.parse(subsData);
+        if (subs.length > 0) {
+            let optionsHtml = '<option value="">— Select Sub-category —</option>';
+            subs.forEach(sub => {
+                const selected = (oldSubCategory == sub.id) ? 'selected' : '';
+                optionsHtml += `<option value="${sub.id}" ${selected}>${sub.name}</option>`;
+            });
+            subSelect.innerHTML = optionsHtml;
+            subContainer.classList.remove('hidden');
+            return;
+        }
+    }
+    
+    subContainer.classList.add('hidden');
+    subSelect.innerHTML = '<option value="">— Select Sub-category —</option>';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    toggleSubcategories();
+});
 </script>
 @endpush

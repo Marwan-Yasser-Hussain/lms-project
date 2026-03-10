@@ -11,7 +11,7 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        $categories = Category::withCount('courses')->get();
+        $categories = Category::withCount('courses')->with('subcategories')->get();
         return view('admin.categories.index', compact('categories'));
     }
 
@@ -24,7 +24,16 @@ class CategoryController extends Controller
             'color'       => 'nullable|string|max:7',
             'is_active'   => 'boolean',
         ]);
-        $validated['slug'] = Str::slug($validated['name']);
+        
+        $baseSlug = Str::slug($validated['name']);
+        $slug = $baseSlug;
+        $count = 1;
+        while (Category::where('slug', $slug)->exists()) {
+            $slug = $baseSlug . '-' . $count;
+            $count++;
+        }
+        $validated['slug'] = $slug;
+
         Category::create($validated);
         return back()->with('success', 'Category created!');
     }
@@ -38,6 +47,16 @@ class CategoryController extends Controller
             'color'       => 'nullable|string|max:7',
             'is_active'   => 'boolean',
         ]);
+
+        $baseSlug = Str::slug($validated['name']);
+        $slug = $baseSlug;
+        $count = 1;
+        while (Category::where('slug', $slug)->where('id', '!=', $category->id)->exists()) {
+            $slug = $baseSlug . '-' . $count;
+            $count++;
+        }
+        $validated['slug'] = $slug;
+
         $category->update($validated);
         return back()->with('success', 'Category updated!');
     }

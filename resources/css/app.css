@@ -181,9 +181,9 @@ body {
    Then we restore white inside any element that has a dark background.
    ───────────────────────────────────────────────────────────────────────── */
 
-/* 1. Any "text-white" directly in the content area → dark navy */
+/* 1. Any "text-white" directly in the content area */
 .main-content .text-white {
-    color: #0F043D !important;
+    color: #fff !important;
 }
 
 /* 2. Restore white inside dark containers (cards, stat-cards, banners, modals) */
@@ -196,23 +196,6 @@ body {
 .main-content [style*="background: linear-gradient"] .text-white\/60,
 .main-content [style*="background: rgba"] .text-white {
     color: #fff !important;
-}
-
-/* 3. Opacity-variant classes (text-white/40, text-white/50, etc.) in main area → tinted navy */
-.main-content .text-white\/40 {
-    color: rgba(15, 4, 61, 0.4) !important;
-}
-
-.main-content .text-white\/50 {
-    color: rgba(15, 4, 61, 0.5) !important;
-}
-
-.main-content .text-white\/60 {
-    color: rgba(15, 4, 61, 0.6) !important;
-}
-
-.main-content .text-white\/30 {
-    color: rgba(15, 4, 61, 0.3) !important;
 }
 
 /* 4. Restore opacity variants inside dark containers */
@@ -640,7 +623,9 @@ body {
     display: block;
 }
 
-
+.main-content .text-white {
+    color: #fff !important;
+}
 
 /* ── Micro-animations ──────────────────────────────────────────────────── */
 @keyframes fadeInUp {
