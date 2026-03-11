@@ -64,6 +64,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::delete('/users/bulk-delete', [UserController::class, 'bulkDelete'])->name('users.bulk-delete');
     Route::get('/users/export/excel', [UserController::class, 'exportExcel'])->name('users.export.excel');
     Route::get('/users/export/pdf',   [UserController::class, 'exportPdf'])->name('users.export.pdf');
+    Route::post('/users/import/preview',  [UserController::class, 'importPreview'])->name('users.import.preview');
+    Route::post('/users/import/confirm',  [UserController::class, 'importConfirm'])->name('users.import.confirm');
+    Route::get('/users/import/template',  [UserController::class, 'importTemplate'])->name('users.import.template');
     Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
     Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
     Route::post('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');

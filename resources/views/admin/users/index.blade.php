@@ -43,7 +43,7 @@
                     </div>
                 </div>
             </div>
-            <button type="button" class="btn text-white transition-opacity hover:opacity-90 px-4"
+            <button type="button" onclick="openImportModal()" class="btn text-white transition-opacity hover:opacity-90 px-4"
                style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); color: #60a5fa;" title="Import from Excel">
                 <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
                 Import
@@ -58,12 +58,7 @@
 </div>
 
 
-{{-- Flash message --}}
-@if(session('success'))
-<div class="alert alert-success mb-4" style="background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.4);color:#6ee7b7;padding:.75rem 1.25rem;border-radius:.5rem;">
-    {{ session('success') }}
-</div>
-@endif
+
 
 {{-- Filters --}}
 <div class="card mb-6">
@@ -196,7 +191,7 @@
 <div id="bulkBar" class="bulk-bar">
     <span class="bulk-bar-count" id="bulkCount">0</span>
     <span class="bulk-bar-label">users selected</span>
-    <form id="bulkDeleteForm" method="POST" action="{{ route('admin.users.bulk-delete') }}" onsubmit="return confirmBulkDelete()">
+    <form id="bulkDeleteForm" method="POST" action="{{ route('admin.users.bulk-delete') }}" onsubmit="event.preventDefault(); confirmBulkDelete();">
         @csrf
         @method('DELETE')
         <input type="hidden" name="ids" id="bulkIds">
@@ -450,6 +445,129 @@
 </script>
 @endif
 
+
+{{-- ─── Import Modal — Step 1: Upload File ─────────────────────────────────── --}}
+<div id="importModal"
+     style="display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;background:rgba(0,0,0,0.65);backdrop-filter:blur(5px);"
+     onclick="if(event.target===this) closeImportModal()">
+    <div style="background:#1a1a2e;border:1px solid rgba(255,255,255,0.1);border-radius:1.25rem;padding:2rem;width:100%;max-width:480px;box-shadow:0 25px 70px rgba(0,0,0,0.6);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+            <div>
+                <h2 style="color:#fff;font-size:1.2rem;font-weight:700;margin:0;">📥 Import Users</h2>
+                <p style="color:rgba(255,255,255,0.4);font-size:.8rem;margin:.25rem 0 0;">Upload an Excel or CSV file to bulk-create accounts</p>
+            </div>
+            <button onclick="closeImportModal()" style="background:none;border:none;color:rgba(255,255,255,0.4);font-size:1.5rem;cursor:pointer;line-height:1;">&times;</button>
+        </div>
+
+        {{-- Drag & Drop zone --}}
+        <div id="importDropzone"
+             onclick="document.getElementById('importFileInput').click()"
+             ondragover="event.preventDefault();this.style.borderColor='#60a5fa';this.style.background='rgba(96,165,250,0.07)';"
+             ondragleave="this.style.borderColor='rgba(255,255,255,0.1)';this.style.background='rgba(255,255,255,0.02)';"
+             ondrop="handleImportDrop(event)"
+             style="border:2px dashed rgba(255,255,255,0.1);border-radius:.75rem;padding:2.5rem 1.5rem;text-align:center;cursor:pointer;background:rgba(255,255,255,0.02);transition:all .2s;">
+            <svg style="width:48px;height:48px;margin:0 auto 1rem;color:rgba(96,165,250,0.6);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            <p style="color:rgba(255,255,255,0.7);font-size:.95rem;font-weight:500;margin:0;">Drop your file here or <span style="color:#60a5fa;">click to browse</span></p>
+            <p style="color:rgba(255,255,255,0.3);font-size:.78rem;margin:.5rem 0 0;">Supports .xlsx, .xls, .csv — max 5 MB</p>
+            <input type="file" id="importFileInput" accept=".xlsx,.xls,.csv" style="display:none;" onchange="handleImportFile(this.files[0])">
+        </div>
+
+        {{-- Error message --}}
+        <div id="importError" style="display:none;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;padding:.7rem 1rem;border-radius:.5rem;font-size:.85rem;margin-top:1rem;"></div>
+
+        {{-- Spinner --}}
+        <div id="importSpinner" style="display:none;text-align:center;padding:1.25rem 0 .5rem;">
+            <div style="display:inline-block;width:36px;height:36px;border:3px solid rgba(96,165,250,0.2);border-top-color:#60a5fa;border-radius:50%;animation:spin .7s linear infinite;"></div>
+            <p style="color:rgba(255,255,255,0.5);font-size:.82rem;margin:.6rem 0 0;">Reading file…</p>
+        </div>
+
+        <div style="display:flex;gap:.75rem;margin-top:1.5rem;align-items:center;justify-content:space-between;">
+            <a href="{{ route('admin.users.import.template') }}" style="color:rgba(96,165,250,0.75);font-size:.8rem;text-decoration:none;display:flex;align-items:center;gap:.35rem;">
+                <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                Download template
+            </a>
+            <button onclick="closeImportModal()" class="btn btn-secondary" style="font-size:.85rem;">Cancel</button>
+        </div>
+    </div>
+</div>
+
+{{-- ─── Import Modal — Step 2: Preview & Edit ───────────────────────────────── --}}
+<div id="importPreviewModal"
+     style="display:none;position:fixed;inset:0;z-index:10000;align-items:flex-start;justify-content:center;background:rgba(0,0,0,0.7);backdrop-filter:blur(5px);overflow-y:auto;padding:2rem 1rem;">
+    <div style="background:#1a1a2e;border:1px solid rgba(255,255,255,0.1);border-radius:1.25rem;padding:2rem;width:100%;max-width:1080px;box-shadow:0 25px 70px rgba(0,0,0,0.6);margin:auto;">
+
+        {{-- Header --}}
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
+            <div>
+                <h2 style="color:#fff;font-size:1.2rem;font-weight:700;margin:0;">✅ Preview & Edit</h2>
+                <p id="previewSubtitle" style="color:rgba(255,255,255,0.4);font-size:.8rem;margin:.25rem 0 0;"></p>
+            </div>
+            <button onclick="closePreviewModal()" style="background:none;border:none;color:rgba(255,255,255,0.4);font-size:1.5rem;cursor:pointer;line-height:1;">&times;</button>
+        </div>
+
+        {{-- Legend note --}}
+        <div style="background:rgba(96,165,250,0.08);border:1px solid rgba(96,165,250,0.2);border-radius:.5rem;padding:.6rem 1rem;font-size:.78rem;color:rgba(255,255,255,0.5);margin-bottom:1rem;">
+            💡 Edit any cell directly. Rows with a <span style="color:#f87171;">red border</span> have validation errors. Password is optional — a random one is auto-assigned if left blank.
+        </div>
+
+        {{-- Scrollable table --}}
+        <div style="overflow-x:auto;border-radius:.75rem;border:1px solid rgba(255,255,255,0.07);">
+            <table id="previewTable" style="width:100%;border-collapse:collapse;font-size:.83rem;">
+                <thead>
+                    <tr style="background:rgba(147,0,86,0.35);">
+                        <th style="padding:.6rem .75rem;text-align:left;color:rgba(255,255,255,0.7);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid rgba(255,255,255,0.08);">#</th>
+                        <th style="padding:.6rem .75rem;text-align:left;color:rgba(255,255,255,0.7);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid rgba(255,255,255,0.08);">Full Name <span style="color:#f87171;">*</span></th>
+                        <th style="padding:.6rem .75rem;text-align:left;color:rgba(255,255,255,0.7);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid rgba(255,255,255,0.08);">Email <span style="color:#f87171;">*</span></th>
+                        <th style="padding:.6rem .75rem;text-align:left;color:rgba(255,255,255,0.7);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid rgba(255,255,255,0.08);">Phone</th>
+                        <th style="padding:.6rem .75rem;text-align:left;color:rgba(255,255,255,0.7);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid rgba(255,255,255,0.08);">Role</th>
+                        <th style="padding:.6rem .75rem;text-align:left;color:rgba(255,255,255,0.7);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid rgba(255,255,255,0.08);">Password</th>
+                        <th style="padding:.6rem .75rem;border-bottom:1px solid rgba(255,255,255,0.08);"></th>
+                    </tr>
+                </thead>
+                <tbody id="previewTableBody"></tbody>
+            </table>
+        </div>
+
+        {{-- Add Row + Actions --}}
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:1rem;flex-wrap:wrap;gap:.75rem;">
+            <button onclick="addPreviewRow()" style="background:rgba(255,255,255,0.04);border:1px dashed rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);padding:.45rem 1rem;border-radius:.5rem;cursor:pointer;font-size:.82rem;transition:all .2s;" onmouseover="this.style.borderColor='#60a5fa';this.style.color='#60a5fa';" onmouseout="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='rgba(255,255,255,0.5)';">
+                + Add Row
+            </button>
+            <div style="display:flex;gap:.75rem;align-items:center;">
+                <button onclick="closePreviewModal()" class="btn btn-secondary" style="font-size:.85rem;">← Back</button>
+                <button onclick="submitImport()" id="confirmImportBtn"
+                        style="background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;border:1px solid rgba(74,222,128,.4);padding:.55rem 1.4rem;border-radius:.6rem;cursor:pointer;font-size:.88rem;font-weight:600;box-shadow:0 4px 14px rgba(22,163,74,.35);transition:opacity .2s;">
+                    ✅ Confirm &amp; Create Accounts
+                </button>
+            </div>
+        </div>
+
+        {{-- Result feedback --}}
+        <div id="importResult" style="display:none;margin-top:1rem;padding:.85rem 1rem;border-radius:.6rem;font-size:.85rem;"></div>
+    </div>
+</div>
+
+<style>
+@keyframes spin { to { transform: rotate(360deg); } }
+.import-cell-input {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: #fff;
+    padding: .3rem .5rem;
+    border-radius: .35rem;
+    width: 100%;
+    font-size: .82rem;
+    outline: none;
+    transition: border-color .15s;
+}
+.import-cell-input:focus { border-color: rgba(96,165,250,0.5); }
+.import-cell-input.error  { border-color: #f87171 !important; }
+.import-row-error td { background: rgba(239,68,68,0.07) !important; }
+.preview-row:nth-child(even) td { background: rgba(255,255,255,0.02); }
+</style>
+
 @endsection
 
 @push('scripts')
@@ -495,8 +613,297 @@
 
     window.confirmBulkDelete = function () {
         const n = getChecked().length;
-        return confirm(`⚠️ Delete ${n} selected user${n > 1 ? 's' : ''}? This action cannot be undone.`);
+        if (n === 0) return;
+        
+        Swal.fire({
+            title: 'Are you sure?',
+            text: `Delete ${n} selected user${n > 1 ? 's' : ''}? This action cannot be undone.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: 'rgba(255,255,255,0.1)',
+            confirmButtonText: 'Yes, delete',
+            background: '#1a1a2e',
+            color: '#fff',
+            customClass: {
+                popup: 'border border-white/10 rounded-2xl',
+                cancelButton: 'text-white hover:bg-white/10 transition-colors',
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('bulkDeleteForm').submit();
+            }
+        });
     };
 })();
+</script>
+@endpush
+
+@push('scripts')
+<script>
+// ══════════════════════════════════════════════════════════════
+//  IMPORT — Step 1: Upload Modal
+// ══════════════════════════════════════════════════════════════
+
+function openImportModal() {
+    // Reset state
+    document.getElementById('importFileInput').value  = '';
+    document.getElementById('importError').style.display   = 'none';
+    document.getElementById('importSpinner').style.display = 'none';
+    // Reset dropzone appearance
+    const dz = document.getElementById('importDropzone');
+    dz.style.borderColor = 'rgba(255,255,255,0.1)';
+    dz.style.background  = 'rgba(255,255,255,0.02)';
+    document.getElementById('importModal').style.display = 'flex';
+}
+
+function closeImportModal() {
+    document.getElementById('importModal').style.display = 'none';
+}
+
+function handleImportDrop(e) {
+    e.preventDefault();
+    const dz = document.getElementById('importDropzone');
+    dz.style.borderColor = 'rgba(255,255,255,0.1)';
+    dz.style.background  = 'rgba(255,255,255,0.02)';
+    const file = e.dataTransfer.files[0];
+    if (file) handleImportFile(file);
+}
+
+async function handleImportFile(file) {
+    if (!file) return;
+
+    const allowed = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                     'application/vnd.ms-excel', 'text/csv'];
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (!['xlsx','xls','csv'].includes(ext)) {
+        showImportError('Invalid file type. Please upload .xlsx, .xls or .csv');
+        return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+        showImportError('File is too large. Maximum size is 5 MB.');
+        return;
+    }
+
+    // Show spinner, hide error
+    document.getElementById('importError').style.display   = 'none';
+    document.getElementById('importSpinner').style.display = 'block';
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('_token', '{{ csrf_token() }}');
+
+    try {
+        const res  = await fetch('{{ route("admin.users.import.preview") }}', { method: 'POST', body: formData });
+        const data = await res.json();
+
+        if (!res.ok) {
+            showImportError(data.error || 'Could not parse the file.');
+            return;
+        }
+
+        // Success — open Step 2
+        closeImportModal();
+        openPreviewModal(data.rows);
+    } catch (err) {
+        showImportError('Network error — please try again.');
+    } finally {
+        document.getElementById('importSpinner').style.display = 'none';
+    }
+}
+
+function showImportError(msg) {
+    const el = document.getElementById('importError');
+    el.textContent = msg;
+    el.style.display = 'block';
+    document.getElementById('importSpinner').style.display = 'none';
+}
+
+// ══════════════════════════════════════════════════════════════
+//  IMPORT — Step 2: Preview & Edit Modal
+// ══════════════════════════════════════════════════════════════
+
+function openPreviewModal(rows) {
+    renderPreviewTable(rows);
+    document.getElementById('previewSubtitle').textContent = rows.length + ' user(s) detected — review and edit before creating accounts';
+    document.getElementById('importResult').style.display  = 'none';
+    document.getElementById('importPreviewModal').style.display = 'flex';
+}
+
+function closePreviewModal() {
+    document.getElementById('importPreviewModal').style.display = 'none';
+    // Re-open Step 1 so admin can upload a different file
+    openImportModal();
+}
+
+let _rowCounter = 0;
+
+function renderPreviewTable(rows) {
+    _rowCounter = 0;
+    const tbody = document.getElementById('previewTableBody');
+    tbody.innerHTML = '';
+    rows.forEach(row => addPreviewRow(row));
+}
+
+function addPreviewRow(data = {}) {
+    _rowCounter++;
+    const idx  = _rowCounter;
+    const tbody = document.getElementById('previewTableBody');
+    const tr    = document.createElement('tr');
+    tr.className = 'preview-row';
+    tr.dataset.idx = idx;
+
+    const roleOptions = ['user','admin'].map(r =>
+        `<option value="${r}" ${(data.role||'user')===r?'selected':''}>${r.charAt(0).toUpperCase()+r.slice(1)}</option>`
+    ).join('');
+
+    tr.innerHTML = `
+        <td style="padding:.45rem .75rem;color:rgba(255,255,255,0.3);font-size:.78rem;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05);">${idx}</td>
+        <td style="padding:.35rem .5rem;border-bottom:1px solid rgba(255,255,255,0.05);">
+            <input class="import-cell-input" data-field="name" placeholder="Full Name" value="${escHtml(data.name||'')}">
+        </td>
+        <td style="padding:.35rem .5rem;border-bottom:1px solid rgba(255,255,255,0.05);">
+            <input class="import-cell-input" data-field="email" type="email" placeholder="email@example.com" value="${escHtml(data.email||'')}">
+        </td>
+        <td style="padding:.35rem .5rem;border-bottom:1px solid rgba(255,255,255,0.05);">
+            <input class="import-cell-input" data-field="phone" placeholder="Optional" value="${escHtml(data.phone||'')}">
+        </td>
+        <td style="padding:.35rem .5rem;border-bottom:1px solid rgba(255,255,255,0.05);">
+            <select class="import-cell-input" data-field="role" style="cursor:pointer;">${roleOptions}</select>
+        </td>
+        <td style="padding:.35rem .5rem;border-bottom:1px solid rgba(255,255,255,0.05);">
+            <input class="import-cell-input" data-field="password" placeholder="Auto-generated if blank" value="${escHtml(data.password||'')}">
+        </td>
+        <td style="padding:.35rem .6rem;border-bottom:1px solid rgba(255,255,255,0.05);text-align:center;">
+            <button onclick="removePreviewRow(this)" title="Remove row"
+                style="background:none;border:none;color:rgba(248,113,113,0.6);font-size:1.1rem;cursor:pointer;padding:0 .3rem;line-height:1;transition:color .15s;"
+                onmouseover="this.style.color='#f87171'" onmouseout="this.style.color='rgba(248,113,113,0.6)'">×</button>
+        </td>
+    `;
+    tbody.appendChild(tr);
+
+    // Live validation highlight
+    tr.querySelectorAll('.import-cell-input').forEach(input => {
+        input.addEventListener('input', () => highlightRow(tr));
+        input.addEventListener('change', () => highlightRow(tr));
+    });
+
+    highlightRow(tr);
+    updateSubtitle();
+}
+
+function removePreviewRow(btn) {
+    btn.closest('tr').remove();
+    updateSubtitle();
+}
+
+function updateSubtitle() {
+    const count = document.querySelectorAll('#previewTableBody .preview-row').length;
+    document.getElementById('previewSubtitle').textContent =
+        count + ' user(s) — review and edit before creating accounts';
+}
+
+function highlightRow(tr) {
+    const name  = tr.querySelector('[data-field="name"]').value.trim();
+    const email = tr.querySelector('[data-field="email"]').value.trim();
+    const nameInput  = tr.querySelector('[data-field="name"]');
+    const emailInput = tr.querySelector('[data-field="email"]');
+
+    nameInput.classList.toggle('error',  name === '');
+    emailInput.classList.toggle('error', email === '' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
+    tr.classList.toggle('import-row-error', name === '' || email === '' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
+}
+
+// ══════════════════════════════════════════════════════════════
+//  IMPORT — Confirm & Submit
+// ══════════════════════════════════════════════════════════════
+
+async function submitImport() {
+    const rows = collectTableRows();
+
+    // Client-side gate: check for obvious errors before sending
+    let hasErrors = false;
+    document.querySelectorAll('#previewTableBody .preview-row').forEach(tr => {
+        highlightRow(tr);
+        if (tr.classList.contains('import-row-error')) hasErrors = true;
+    });
+
+    if (hasErrors) {
+        showImportResult('Please fix the highlighted rows (red border) before confirming.', 'error');
+        return;
+    }
+
+    if (rows.length === 0) {
+        showImportResult('No rows to import.', 'error');
+        return;
+    }
+
+    const btn = document.getElementById('confirmImportBtn');
+    btn.disabled = true;
+    btn.style.opacity = '.6';
+    btn.textContent = 'Creating accounts…';
+
+    try {
+        const res  = await fetch('{{ route("admin.users.import.confirm") }}', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            body:    JSON.stringify({ rows }),
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+            showImportResult(data.error || 'Server error — please try again.', 'error');
+            return;
+        }
+
+        let msg = `✅ <strong>${data.created}</strong> account(s) created successfully!`;
+
+        if (data.errors && data.errors.length > 0) {
+            msg += `<br><br>⚠️ <strong>${data.errors.length}</strong> row(s) had errors:<ul style="margin:.4rem 0 0 1.2rem;padding:0;">`;
+            data.errors.forEach(e => {
+                msg += `<li><strong>Row ${e.row}</strong> (${e.email || e.name}): ${e.messages.join(', ')}</li>`;
+            });
+            msg += '</ul>';
+            showImportResult(msg, 'warning');
+        } else {
+            showImportResult(msg, 'success');
+            // Auto-reload after short delay so user can read the message
+            setTimeout(() => location.reload(), 2200);
+        }
+
+    } catch (err) {
+        showImportResult('Network error — please try again.', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.textContent = '✅ Confirm & Create Accounts';
+    }
+}
+
+function collectTableRows() {
+    const rows = [];
+    document.querySelectorAll('#previewTableBody .preview-row').forEach(tr => {
+        const get = field => tr.querySelector(`[data-field="${field}"]`).value.trim();
+        rows.push({ name: get('name'), email: get('email'), phone: get('phone'), role: get('role'), password: get('password') });
+    });
+    return rows;
+}
+
+function showImportResult(html, type) {
+    const el = document.getElementById('importResult');
+    const colors = {
+        success: { bg: 'rgba(22,163,74,0.15)', border: 'rgba(74,222,128,0.3)', color: '#86efac' },
+        error:   { bg: 'rgba(239,68,68,0.12)', border: 'rgba(248,113,113,0.3)', color: '#fca5a5' },
+        warning: { bg: 'rgba(234,179,8,0.1)',  border: 'rgba(253,224,71,0.3)',  color: '#fde047' },
+    };
+    const c = colors[type] || colors.success;
+    el.style.cssText = `display:block;margin-top:1rem;padding:.85rem 1rem;border-radius:.6rem;font-size:.85rem;background:${c.bg};border:1px solid ${c.border};color:${c.color};`;
+    el.innerHTML = html;
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 </script>
 @endpush

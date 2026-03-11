@@ -115,9 +115,10 @@
     </thead>
     <tbody>
         @forelse($users as $i => $user)
+        @php $nameIsAr = (bool) preg_match('/\p{Arabic}/u', (string)$user->name); @endphp
         <tr>
             <td style="text-align:center; color:#888;">{{ $i + 1 }}</td>
-            <td><strong>{{ $user->name }}</strong></td>
+            <td style="{{ $nameIsAr ? 'text-align:right;' : '' }}"><strong>{{ $user->name }}</strong></td>
             <td style="color:#555;">{{ $user->email }}</td>
             <td>
                 <span class="badge badge-{{ $user->role }}">{{ ucfirst($user->role) }}</span>

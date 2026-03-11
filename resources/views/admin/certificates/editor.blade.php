@@ -26,22 +26,7 @@
     </div>
 </div>
 
-{{-- Flash messages --}}
-@if(session('success'))
-    <div style="background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.5rem;color:#4ade80;font-size:0.875rem;">
-        ✅ {{ session('success') }}
-    </div>
-@endif
-@if($errors->any())
-    <div style="background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1.5rem;">
-        <p style="color:#f87171;font-weight:600;font-size:0.85rem;margin-bottom:0.5rem;">⚠ Please fix the following errors:</p>
-        <ul style="list-style:disc;padding-left:1.5rem;color:rgba(255,255,255,0.6);font-size:0.82rem;">
-            @foreach($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
+
 
 <form method="POST" action="{{ route('admin.courses.certificate.update', $course) }}" enctype="multipart/form-data" id="cert-form">
     @csrf

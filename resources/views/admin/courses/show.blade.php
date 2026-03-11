@@ -30,17 +30,7 @@
     </div>
 </div>
 
-{{-- Flash messages --}}
-@if(session('success'))
-    <div style="background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.5rem;color:#4ade80;font-size:0.875rem;">
-        ✅ {{ session('success') }}
-    </div>
-@endif
-@if(session('error'))
-    <div style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.5rem;color:#f87171;font-size:0.875rem;">
-        ❌ {{ session('error') }}
-    </div>
-@endif
+
 
 <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
