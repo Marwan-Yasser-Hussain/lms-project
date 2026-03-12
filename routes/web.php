@@ -19,10 +19,11 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register')->middleware('guest');
 Route::post('/register', [AuthController::class, 'register'])->name('register.post');
 
-// ── Home (placeholder until student dashboard is built) ──────────────────────
-Route::get('/', function () {
-    return redirect()->route('login');
-})->name('home');
+use App\Http\Controllers\HomeController;
+
+// ── Home ─────────────────────────────────────────────────────────────────────
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
 
 // ── Admin Routes ─────────────────────────────────────────────────────────────
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
